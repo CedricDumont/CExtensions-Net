@@ -54,7 +54,11 @@ namespace CExtensions.Test
 
                 emptyContext.Authors.Attach(aut1);
 
-                string fromFile = await emptyContext.AsXmlAsync("CExtensions.SampleApp", ContextDataEnum.Local, includeNull: true);
+                string fromFile = await emptyContext.AsXmlAsync("CExtensions.Effort.SampleApp", ContextDataEnum.Local, includeNull: true);
+
+                dynamic obj = fromFile.XmlToDynamic();
+
+                ((string)obj.AUTHOR[0].AUT_FIRSTNAME).ShouldBe("testname");
             }
         }
     }
