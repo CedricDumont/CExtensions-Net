@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>CExtensions.Common</title>
+    <authors>Dumont Cedric</authors>
+    <owners>Dumont Cedric</owners>
+    <projectUrl>https://github.com/CExtensions/Net-Common</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Common extensions for all Cextensions projects in .net</description>
+    <summary>Common extensions for all Cextensions projects in .net</summary>
+    <copyright>Copyright 2015</copyright>
+    <tags>.NET Extensions</tags>
+  </metadata>
+</package>

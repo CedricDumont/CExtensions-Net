@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <version>$version$</version>
+    <authors>Cedric Dumont</authors>
+    <owners>Cedric Dumont</owners>
+    <id>$id$</id>
+    <title>Cextensions.Effort</title>
+    <projectUrl>https://github.com/CExtensions/Net-Effort</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Extensions for the Effort testing framework. check website for more info</description>
+  </metadata>
+  <files />
+</package>
