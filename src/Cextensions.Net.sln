@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{2AA6B3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CExtensions.EntityFramework.Test", "CExtensions.EntityFramework.Test\CExtensions.EntityFramework.Test.csproj", "{A372288F-D715-4150-A236-1F29B77007EA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C23B6058-7F42-419C-A69F-C0C7C885C488}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,5 +75,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8442A366-1AE3-419E-95C7-FF9AEB68C284} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
+		{21BB98AD-44C7-4BAF-BDDA-CC5F4DF08EA7} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
+		{5DC54C26-B99F-497D-9A80-97E42DDF9847} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
+		{1411283A-E8E5-4BBC-8202-1A95150BE6C6} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
+		{A372288F-D715-4150-A236-1F29B77007EA} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
 	EndGlobalSection
 EndGlobal
