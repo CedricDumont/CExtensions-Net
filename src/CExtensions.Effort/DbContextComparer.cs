@@ -10,9 +10,9 @@ using CExtensions.EF;
 namespace CExtensions.Effort
 {
 
-    internal class DbContextObjectComparer
+    internal class DbContextComparer
     {
-        private DbContextObjectComparer()
+        private DbContextComparer()
         {
 
         }
@@ -54,13 +54,13 @@ namespace CExtensions.Effort
         }
 
 
-        private static async Task<IList<DbContextCheckEntry>> CheckCollectionCount(IList<DbSet> expectedDbSets, DbContext actualContext, string assemblyName)
+        private static async Task<IList<DbContextCheckEntry>> CheckCollectionCount(IList<DbSet> expectedDbSets, DbContext actualContext)
         {
             IList<DbContextCheckEntry> result = new List<DbContextCheckEntry>();
             foreach (DbSet dbSet in expectedDbSets)
             {
                 var expectedList = await dbSet.ToListAsync();
-                var actualList = await actualContext.DbSetFor(dbSet.ElementType.Name, assemblyName).ToListAsync();
+                var actualList = await actualContext.DbSetFor(dbSet.ElementType.Name).ToListAsync();
                 if (actualList.Count != expectedList.Count)
                 {
                     DbContextCheckEntry entry = new DbContextCheckEntry();
@@ -77,11 +77,11 @@ namespace CExtensions.Effort
         }
 
 
-        public static async Task<DbContextCheckResult> ChecDbCOntext(DbContext expectedctx, DbContext actualContext, string assemblyName, string[] ignoreFields)
+        public static async Task<DbContextCheckResult> Compare(DbContext expectedctx, DbContext actualContext, string assemblyName = null, string[] ignoreFields = null)
         {
-            IList<DbSet> expectedDbSets = expectedctx.DbSets(assemblyName);
+            IList<DbSet> expectedDbSets = expectedctx.DbSets();
 
-            IList<DbContextCheckEntry> collectionCountResult = await CheckCollectionCount(expectedDbSets, actualContext, assemblyName);
+            IList<DbContextCheckEntry> collectionCountResult = await CheckCollectionCount(expectedDbSets, actualContext);
 
             if(collectionCountResult.Count > 0)
             {
@@ -110,7 +110,7 @@ namespace CExtensions.Effort
 
                             actualObject = actualDbSet.Find(idValue);
 
-                            ComparisonResult cr = DbContextObjectComparer.CompareObjects(expectedObject, actualObject, dbSet.ElementType.Name, idValue + "", ignoredMembers);
+                            ComparisonResult cr = DbContextComparer.CompareObjects(expectedObject, actualObject, dbSet.ElementType.Name, idValue + "", ignoredMembers);
 
                             if (!cr.AreEqual)
                             {
@@ -149,9 +149,9 @@ namespace CExtensions.Effort
 
     public static class DbContextCompareExtensions
     {
-        public static async Task<DbContextCheckResult> CompareTo(this DbContext dbcontext, DbContext expectedContext, string assemblyName, string[] ignoredProperties = null)
+        public static async Task<DbContextCheckResult> CompareTo(this DbContext dbcontext, DbContext expectedContext, string assemblyName = null, string[] ignoredProperties = null)
         {
-            return await DbContextObjectComparer.ChecDbCOntext(expectedContext, dbcontext, assemblyName, ignoredProperties);
+            return await DbContextComparer.Compare(expectedContext, dbcontext, assemblyName, ignoredProperties);
         }
 
 

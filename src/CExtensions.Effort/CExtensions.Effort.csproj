@@ -67,7 +67,7 @@
   <ItemGroup>
     <Compile Include="DbContextCheckEntry.cs" />
     <Compile Include="DbContextCheckResult.cs" />
-    <Compile Include="DbContextObjectComparer.cs" />
+    <Compile Include="DbContextComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XmlDataLoader.cs" />
     <Compile Include="XmlFileContext.cs" />
