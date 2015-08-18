@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using CExtensions.EF;
+using CExtensions.EntityFramework;
 using System.Diagnostics;
 
 namespace CExtensions.Effort

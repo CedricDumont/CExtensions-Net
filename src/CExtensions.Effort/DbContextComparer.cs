@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations.Schema;
-using CExtensions.EF;
+using CExtensions.EntityFramework;
 
 namespace CExtensions.Effort
 {

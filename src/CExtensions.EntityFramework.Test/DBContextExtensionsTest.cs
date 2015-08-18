@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using Shouldly;
 using CExtensions.Effort.SampleApp;
-using CExtensions.EF;
+using CExtensions.EntityFramework;
 using CExtensions.Effort;
 using System.Threading.Tasks;
 

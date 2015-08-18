@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using CExtensions.Effort;
 using Xunit;
 using CExtensions.Effort.SampleApp;
-using CExtensions.EF;
+using CExtensions.EntityFramework;
 using System.Xml;
 using Shouldly;
 

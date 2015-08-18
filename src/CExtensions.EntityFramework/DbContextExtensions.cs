@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace CExtensions.EF
+namespace CExtensions.EntityFramework
 {
     public static class DbContextExtensions
     {
