@@ -17,7 +17,7 @@ namespace CExtensions.Effort
 
         }
 
-        private static ComparisonResult CompareObjects(Object expectedObj, Object actualObj, string objectName = "", String id = "", String[] ignoredMembers = null)
+        private static ComparisonResult CompareObjects(Object expectedObj, Object actualObj, String[] ignoredMembers = null)
         {
 
             ComparisonConfig cfg = new ComparisonConfig()
@@ -39,11 +39,12 @@ namespace CExtensions.Effort
                 cfg.MembersToIgnore.AddRange(ignoredMembers);
             }
             //also add not mapped attributes
-            if(actualObj.PropertiesWithAttribute<NotMappedAttribute>().Length > 0)
+            if (actualObj.PropertiesWithAttribute<NotMappedAttribute>().Length > 0)
             {
                 cfg.MembersToIgnore.AddRange(actualObj.PropertiesWithAttribute<NotMappedAttribute>());
             }
 
+            //check on null objects
             CompareLogic cpl = new CompareLogic(cfg);
 
 
@@ -83,7 +84,7 @@ namespace CExtensions.Effort
 
             IList<DbContextCheckEntry> collectionCountResult = await CheckCollectionCount(expectedDbSets, actualContext);
 
-            if(collectionCountResult.Count > 0)
+            if (collectionCountResult.Count > 0)
             {
                 return new DbContextCheckResult(false, collectionCountResult);
             }
@@ -103,21 +104,32 @@ namespace CExtensions.Effort
                     var prop = expectedObject.GetType().GetProperty(idProp, BindingFlags.Public | BindingFlags.Instance);
                     if (prop != null)
                     {
-                        
-                            var idValue = prop.GetValue(expectedObject);
 
-                            var actualDbSet = actualContext.Set(dbSet.ElementType);
+                        var idValue = prop.GetValue(expectedObject);
 
-                            actualObject = actualDbSet.Find(idValue);
+                        var actualDbSet = actualContext.Set(dbSet.ElementType);
 
-                            ComparisonResult cr = DbContextComparer.CompareObjects(expectedObject, actualObject, dbSet.ElementType.Name, idValue + "", ignoredMembers);
+                        actualObject = actualDbSet.Find(idValue);
+
+                        if (actualObject == null)
+                        {
+                            DbContextCheckEntry entry = DbContextCheckEntry
+                                .ForObject(idValue.ToString(), dbSet.ElementType.Name, null)
+                                .WithDescription("we couldn't find an actual object with expected id  : " 
+                                + idValue + " - this can be caused because the id is auto generated. You could adapt the ids of the expected object" );
+                            return new DbContextCheckResult(false, entry);
+                        }
+                        else
+                        {
+                            ComparisonResult cr = DbContextComparer.CompareObjects(expectedObject, actualObject, ignoredMembers);
 
                             if (!cr.AreEqual)
                             {
                                 return new DbContextCheckResult(false,
-                                    cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name));
+                                    cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name, actualObject));
                             }
-                       
+                        }
+
                     }
                 }
             }
@@ -145,7 +157,7 @@ namespace CExtensions.Effort
         }
     }
 
-    
+
 
     public static class DbContextCompareExtensions
     {
@@ -155,7 +167,8 @@ namespace CExtensions.Effort
         }
 
 
-        internal static IList<DbContextCheckEntry> ToDbContextCheckEntry(this IEnumerable<Difference> differences, Object objectId, string objectName)
+        internal static IList<DbContextCheckEntry> ToDbContextCheckEntry(this IEnumerable<Difference> differences, 
+            Object objectId, string objectName, Object objectValue)
         {
             IList<DbContextCheckEntry> entries = new List<DbContextCheckEntry>();
 
@@ -169,7 +182,7 @@ namespace CExtensions.Effort
                 }
 
                 var entry = DbContextCheckEntry
-                                .ForObject(objectId.ToString(), objectName)
+                                .ForObject(objectId.ToString(), objectName, objectValue)
                                 .WithProperty(propName)
                                 .Was(item.Object2Value)
                                 .InsteadOf(item.Object1Value);

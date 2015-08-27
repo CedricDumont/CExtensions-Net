@@ -44,6 +44,24 @@ namespace CExtensions.Test
             result.AreEqual.ShouldBe(false);
         }
 
+        [Fact]
+        public async Task ShouldReturnFalseForContextWithSameCollectionCountButDifferentIds()
+        {
+            XmlFileContext<SampleContext> xmlFileCtx = new XmlFileContext<SampleContext>(this.GetType());
+
+            XmlFileContext<SampleContext> xmlFileExpectedCtx = new XmlFileContext<SampleContext>(this.GetType());
+
+            SampleContext ctx1 = xmlFileCtx.InputContext("test3");
+            SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test3");
+
+            var result = await ctx1.CompareTo(ctx2, _assemblyName);
+
+            result.AreEqual.ShouldBe(false);
+            result.Differences.Count.ShouldBe(1);
+            result.Differences[0].ToString().ShouldBe("Author was null - object id : 2 (we couldn't find an actual object with expected id  : 2 - this can be caused because the id is auto generated. You could adapt the ids of the expected object)");
+
+        }
+
 
         [Fact]
         public async Task ShouldReturnFalseForContextWithEntryContainingDifferentValues()
