@@ -113,8 +113,9 @@ namespace CExtensions.Effort
 
                         if (actualObject == null)
                         {
+                            string columnName = expectedctx.MappedColumnName(dbSet.ElementType.Name, prop.Name);
                             DbContextCheckEntry entry = DbContextCheckEntry
-                                .ForObject(idValue.ToString(), dbSet.ElementType.Name, null)
+                                .ForObject(idValue.ToString(), dbSet.ElementType.Name, null, columnName)
                                 .WithDescription("we couldn't find an actual object with expected id  : " 
                                 + idValue + " - this can be caused because the id is auto generated. You could adapt the ids of the expected object" );
                             return new DbContextCheckResult(false, entry);
@@ -125,8 +126,9 @@ namespace CExtensions.Effort
 
                             if (!cr.AreEqual)
                             {
+                                string columnName = expectedctx.MappedColumnName(dbSet.ElementType.Name, prop.Name);
                                 return new DbContextCheckResult(false,
-                                    cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name, actualObject));
+                                    cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name, actualObject, columnName));
                             }
                         }
 
@@ -168,7 +170,7 @@ namespace CExtensions.Effort
 
 
         internal static IList<DbContextCheckEntry> ToDbContextCheckEntry(this IEnumerable<Difference> differences, 
-            Object objectId, string objectName, Object objectValue)
+            Object objectId, string objectName, Object objectValue, string idColumnName = null)
         {
             IList<DbContextCheckEntry> entries = new List<DbContextCheckEntry>();
 
@@ -182,7 +184,7 @@ namespace CExtensions.Effort
                 }
 
                 var entry = DbContextCheckEntry
-                                .ForObject(objectId.ToString(), objectName, objectValue)
+                                .ForObject(objectId.ToString(), objectName, objectValue, idColumnName)
                                 .WithProperty(propName)
                                 .Was(item.Object2Value)
                                 .InsteadOf(item.Object1Value);

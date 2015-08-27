@@ -9,12 +9,13 @@ namespace CExtensions.Effort
     public class DbContextCheckEntry
     {
 
-        public static DbContextCheckEntry ForObject(string id, string objectName, Object objectValue)
+        public static DbContextCheckEntry ForObject(string id, string objectName, Object objectValue, string idPropertyName)
         {
             DbContextCheckEntry entry = new DbContextCheckEntry();
             entry.ObjectId = id;
             entry.ObjectName = objectName;
             entry.ObjectValue = objectValue;
+            entry.IdPropertyName = idPropertyName;
             return entry;
         }
 
@@ -42,6 +43,8 @@ namespace CExtensions.Effort
             return this;
         }
 
+        public string IdPropertyName { get; set; }
+
         public String ObjectId { get; set; }
 
         public string ObjectName { get; set; }
@@ -59,14 +62,15 @@ namespace CExtensions.Effort
         public override string ToString()
         {
             String result = "";
+            string objectIdentifierText = "object with " + (IdPropertyName ?? "id") + " : " + ObjectId;
             if (ObjectValue == null)
             {
-                result += ObjectName + " was null - object id : " + ObjectId;
+                result += ObjectName + " was null - " + objectIdentifierText;
             }
             else
             {
                 // return   ObjectName + " with id " + ObjectId + " has " + PropertyName + " containing [" + ActualPropertyContent + "] instead of [" + ExpectedPropertyContent + "]";
-                result += ObjectName + "." + PropertyName + " Should be [" + ExpectedPropertyContent + "] but was [" + ActualPropertyContent + "] - object id : " + ObjectId;
+                result += ObjectName + "." + PropertyName + " Should be [" + ExpectedPropertyContent + "] but was [" + ActualPropertyContent + "] - " + objectIdentifierText;
             }
 
             if(Description != null)

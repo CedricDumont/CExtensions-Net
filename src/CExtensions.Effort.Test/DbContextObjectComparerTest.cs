@@ -58,7 +58,7 @@ namespace CExtensions.Test
 
             result.AreEqual.ShouldBe(false);
             result.Differences.Count.ShouldBe(1);
-            result.Differences[0].ToString().ShouldBe("Author was null - object id : 2 (we couldn't find an actual object with expected id  : 2 - this can be caused because the id is auto generated. You could adapt the ids of the expected object)");
+            result.Differences[0].ToString().ShouldBe("Author was null - object with AUT_ID : 2 (we couldn't find an actual object with expected id  : 2 - this can be caused because the id is auto generated. You could adapt the ids of the expected object)");
 
         }
 
@@ -82,7 +82,7 @@ namespace CExtensions.Test
             result.Differences[0].PropertyName.ShouldBe("Subject");
             result.Differences[0].ActualPropertyContent.ShouldBe("First Text");
             result.Differences[0].ExpectedPropertyContent.ShouldBe("First Text Modified");
-            result.Differences[0].ToString().ShouldBe("Post.Subject Should be [First Text Modified] but was [First Text] - object id : 2");
+            result.Differences[0].ToString().ShouldBe("Post.Subject Should be [First Text Modified] but was [First Text] - object with Post_Id : 2");
 
             result.Differences[1].ObjectId.ShouldBe("2");
             result.Differences[1].ObjectName.ShouldBe("Post");
