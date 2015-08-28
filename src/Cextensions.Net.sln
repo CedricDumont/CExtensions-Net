@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CExtensions.EntityFramework
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{C23B6058-7F42-419C-A69F-C0C7C885C488}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CExtensions.Common.Test", "CExtensions.Common.Test\CExtensions.Common.Test.csproj", "{860A9542-5EED-439B-84FC-E3493CC4E320}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,10 @@ Global
 		{A372288F-D715-4150-A236-1F29B77007EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A372288F-D715-4150-A236-1F29B77007EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A372288F-D715-4150-A236-1F29B77007EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860A9542-5EED-439B-84FC-E3493CC4E320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860A9542-5EED-439B-84FC-E3493CC4E320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860A9542-5EED-439B-84FC-E3493CC4E320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860A9542-5EED-439B-84FC-E3493CC4E320}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +88,6 @@ Global
 		{5DC54C26-B99F-497D-9A80-97E42DDF9847} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
 		{1411283A-E8E5-4BBC-8202-1A95150BE6C6} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
 		{A372288F-D715-4150-A236-1F29B77007EA} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
+		{860A9542-5EED-439B-84FC-E3493CC4E320} = {C23B6058-7F42-419C-A69F-C0C7C885C488}
 	EndGlobalSection
 EndGlobal

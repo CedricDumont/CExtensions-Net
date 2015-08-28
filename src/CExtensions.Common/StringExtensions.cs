@@ -57,6 +57,11 @@ namespace System
             }
         }
 
+        public static bool IsNotNullOrEmpty(this string s)
+        {
+            return !s.IsNullOrEmpty();
+        }
+
         public static string Right(this string str, int length)
         {
             return str.Substring(str.Length - length, length);
@@ -80,6 +85,31 @@ namespace System
         public static bool Contains(this string source, string toCheck, StringComparison comp)
         {
             return source.IndexOf(toCheck, comp) >= 0;
+        }
+
+        /// <summary>
+        /// Limits the length of string to <code>limit</code>
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="limit">max length</param>
+        /// <returns></returns>
+        public static String Limit(this string s, int limit)
+        {
+            if (s != null)
+            {
+                if (s.Length > limit)
+                {
+                    if (limit < 0)
+                    {
+                        s = ""; ;
+                    }
+                    else
+                    {
+                        s = s.Substring(0, limit);
+                    }
+                }
+            }
+            return s;
         }
         
     }

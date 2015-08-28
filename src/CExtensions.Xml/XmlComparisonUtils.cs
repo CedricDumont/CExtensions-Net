@@ -11,7 +11,7 @@ namespace CExtensions.Xml
 {
     public class XmlComparisonUtils
     {
-        public XmlComparisonResult CompareXml(string actualXml, string expectedXml, string[] ignoreFields = null)
+        public XmlComparisonResult CompareXml(string actualXml, string expectedXml, params string[] ignoreFields)
         {
             var comparer = new netbike.XmlComparer
             {
