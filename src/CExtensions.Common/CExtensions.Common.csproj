@@ -41,7 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionExtensions.cs" />
-    <Compile Include="DateExtensions.cs" />
+    <Compile Include="DateTime\DateExtensions.cs" />
+    <Compile Include="DateTime\Quarter.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Int32Extensions.cs" />
