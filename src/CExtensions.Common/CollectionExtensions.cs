@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public static class CollectionExtensions
 {
-     
+
     public static bool IsACollectionType(this PropertyInfo property)
     {
         return (!typeof(String).Equals(property.PropertyType) &&
@@ -30,5 +30,15 @@ public static class CollectionExtensions
         //    return true;
         //}
         //return false;
+    }
+
+    public static String Concatenated(this IEnumerable<string> list)
+    {
+        StringBuilder sb = new StringBuilder();
+        foreach (var item in list)
+        {
+            sb.Append(item);
+        }
+        return sb.ToString();
     }
 }

@@ -11,6 +11,11 @@ namespace System
     {
         public static bool ContainsOneOf(this string s, string[] values)
         {
+            if(values == null)
+            {
+                return false;
+            }
+
             foreach (string val in values)
             {
                 if (s.Contains(val))
