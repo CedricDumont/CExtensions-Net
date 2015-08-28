@@ -29,7 +29,10 @@ namespace System
 
         public int Value { get { return _internalRepresentation; } }
 
-
+        public static implicit operator int(Quarter quarter)
+        {
+            return quarter.Value;
+        }
 
     }
 }
