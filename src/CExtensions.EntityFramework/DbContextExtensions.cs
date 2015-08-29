@@ -327,7 +327,9 @@ namespace CExtensions.EntityFramework
         {
             string entityName = dbContext.MappedEntity(TableName);
 
-            return GetEntityMapping(dbContext, entityName);
+            EntityType entityType = dbContext.EntitySets().Where(e => e.ElementType.Name == entityName).Single().ElementType;
+
+            return GetEntityMapping(dbContext, entityType.GetClrType());
 
         }
 
@@ -335,17 +337,17 @@ namespace CExtensions.EntityFramework
         {
             Type t = typeof(T);
 
-            return GetEntityMapping(dbContext, t.Name);
+            return GetEntityMapping(dbContext, t);
            
         }
 
-        private static EntityMapping GetEntityMapping(DbContext dbContext, string entityName)
+        private static EntityMapping GetEntityMapping(DbContext dbContext, Type clrType)
         {
-            string tableName = dbContext.MappedTable(entityName);
+            string tableName = dbContext.MappedTable(clrType.Name);
 
-            IEnumerable<PropertyColumnMapping> propertiesMapping = dbContext.MappingTable(entityName);
+            IEnumerable<PropertyColumnMapping> propertiesMapping = dbContext.MappingTable(clrType.Name);
 
-            return new EntityMapping(entityName, tableName, propertiesMapping);
+            return new EntityMapping(clrType, tableName, propertiesMapping);
         }
 
         public static String MappedColumnName(this DbContext dbContext, string entityName, string propertyName)
@@ -448,16 +450,19 @@ namespace CExtensions.EntityFramework
 
     public class EntityMapping
     {
-        public EntityMapping(string entityName, string tableName, IEnumerable<PropertyColumnMapping> propertiesMapping)
+        internal EntityMapping(Type clrType, string tableName, IEnumerable<PropertyColumnMapping> propertiesMapping)
         {
             // TODO: Complete member initialization
-            this.EntityName = entityName;
-            this.TableName = tableName;
+            this.ClrType = clrType;
+            this.Table = tableName;
             this.PropertiesMapping = propertiesMapping;
         }
-        public String EntityName { get; private set; }
 
-        public String TableName { get; private set; }
+        public Type ClrType { get; set; }
+
+        public String Entity { get { return ClrType.Name; } }
+
+        public String Table { get; private set; }
 
         public IEnumerable<PropertyColumnMapping> PropertiesMapping { get; private set; }
 

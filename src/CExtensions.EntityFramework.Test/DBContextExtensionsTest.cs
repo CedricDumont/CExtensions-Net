@@ -86,8 +86,8 @@ namespace CExtensions.EntityFramework.Test
             {
                 var entityMapping = emptyContext.GetMappings<Author>();
 
-                entityMapping.TableName.ShouldBe("AUTHOR");
-                entityMapping.EntityName.ShouldBe("Author");
+                entityMapping.Table.ShouldBe("AUTHOR");
+                entityMapping.Entity.ShouldBe("Author");
                 entityMapping.PropertiesMapping.Count().ShouldBe(4);
 
                 entityMapping.MappedColumn("FirstName").ShouldBe("AUT_FIRSTNAME");
@@ -100,9 +100,8 @@ namespace CExtensions.EntityFramework.Test
                 //from table name
                 entityMapping = emptyContext.GetMappings("AUTHOR");
 
-                entityMapping.TableName.ShouldBe("AUTHOR");
-                entityMapping.EntityName.ShouldBe("Author");
-                entityMapping.PropertiesMapping.Count().ShouldBe(4);
+                entityMapping.Entity.ShouldBe("Author");
+                entityMapping.ClrType.ShouldBe(typeof(Author));
             }
         }
     }
