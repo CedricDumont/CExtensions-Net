@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Core.EntityClient;
+using System.Data.Entity.Core.Mapping;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Infrastructure;
@@ -22,67 +23,54 @@ namespace CExtensions.EntityFramework
             return ((IObjectContextAdapter)dbContext).ObjectContext;
         }
 
-        public static IList<EntitySetBase> EntitySets(this DbContext dbContext)
+        public static MetadataWorkspace MetadataWorkspace(this DbContext dbContext)
         {
-            var expectedMetaData = dbContext.AsObjectContext().MetadataWorkspace;
+            return dbContext.AsObjectContext().MetadataWorkspace;;
+        }
 
-            var tables = expectedMetaData.GetItemCollection(DataSpace.SSpace)
-             .GetItems<EntityContainer>()
+        public static IList<EntitySetBase> StoreEntitySets(this DbContext dbContext)
+        {
+            var sets = dbContext.MetadataWorkspace()
+             .GetItems<EntityContainer>(DataSpace.SSpace)
              .Single()
              .BaseEntitySets;
 
-            return tables;
+            return sets;
         }
 
-        public static Type GetCorrespondingType(this DbContext dbContext, String EntityName)
+        public static IList<EntitySetBase> ConceptualEntitySets(this DbContext dbContext)
         {
-            //TODO : This code should be rewworked : check in OSpace, I think I've seen the type that is easier to access.
-            var expectedMetaData = dbContext.AsObjectContext().MetadataWorkspace;
+            var sets = dbContext.MetadataWorkspace()
+             .GetItems<EntityContainer>(DataSpace.CSpace)
+             .Single()
+             .BaseEntitySets;
 
-            var tables = expectedMetaData.GetItemCollection(DataSpace.CSSpace);
-
-            //var ospace = expectedMetaData.GetItemCollection(DataSpace.OSpace);
-
-            //var fromospace = ospace.Where(p => p.BuiltInTypeKind == BuiltInTypeKind.EntityType).First();
-
-            //var someOtherresult = fromospace.MetadataProperties;
-
-            var ConceptualEntityContainer = ((System.Data.Entity.Core.Mapping.EntityContainerMapping)(tables[0])).ConceptualEntityContainer;
-
-            var entitySet = ConceptualEntityContainer.EntitySets.Where(p => p.ElementType.Name == EntityName).FirstOrDefault();
-
-            if(entitySet == null)
-            {
-                return null;
-            }
-
-            var elementType = entitySet.ElementType;
-
-            var typefound = (elementType.MetadataProperties.Where(p => p.Name == "http://schemas.microsoft.com/ado/2013/11/edm/customannotation:ClrType").FirstOrDefault());
-            
-            if(typefound == null)
-            {
-                throw new Exception("could not infer clr type using the db context");
-            }
-
-            return (Type)typefound.Value;
-
+            return sets;
         }
 
-         [Obsolete("The parameter 'assemblyName' is no longer used. it will be cleaned in next releases. it was marked as optional")]
-       
-        public static IList<DbSet> DbSets(this DbContext dbContext,  string assemblyName = null)
+        public static IList<EntitySet> EntitySets(this DbContext dbContext)
+        {
+            EntityContainerMapping mapping = dbContext.MetadataWorkspace().GetItems<EntityContainerMapping>(DataSpace.CSSpace)
+                    .Single();
+
+            var sets = mapping.ConceptualEntityContainer.EntitySets;
+
+            return sets;
+        }
+
+        [Obsolete("The parameter 'assemblyName' is no longer used. it will be cleaned in next releases. it was marked as optional")]
+        public static IEnumerable<DbSet> DbSets(this DbContext dbContext, string assemblyName = null)
         {
             return dbContext.DbSets();
         }
 
-        public static IList<DbSet> DbSets(this DbContext dbContext)
+        public static IEnumerable<DbSet> DbSets(this DbContext dbContext)
         {
             IList<DbSet> result = new List<DbSet>();
 
-            foreach (EntitySetBase type in dbContext.EntitySets())
+            foreach (EntitySet set in dbContext.EntitySets())
             {
-                var objtype = dbContext.GetCorrespondingType(type.Name);
+                var objtype = set.ElementType.GetClrType();
 
                 if (objtype != null)
                 {
@@ -98,10 +86,10 @@ namespace CExtensions.EntityFramework
         [Obsolete("will be removed in further release : assemblyName no longer used")]
         public static DbSet DbSetFor(this DbContext dbContext, String entityName, string assemblyName )
         {
-            return dbContext.DbSetFor(entityName);
+            return dbContext.Set(entityName);
         }
 
-        public static DbSet DbSetFor(this DbContext dbContext, String entityName)
+        public static DbSet Set(this DbContext dbContext, String entityName)
         {
             var dbSet = (from dbs in dbContext.DbSets() where dbs.ElementType.Name == entityName select dbs).FirstOrDefault();
 
@@ -112,7 +100,7 @@ namespace CExtensions.EntityFramework
         {
             IList<PropertyColumnMapping> result = new List<PropertyColumnMapping>();
 
-            var storageMetadata = ((EntityConnection)dbContext.AsObjectContext().Connection).GetMetadataWorkspace().GetItems(DataSpace.SSpace);
+            var storageMetadata = dbContext.MetadataWorkspace().GetItems(DataSpace.SSpace);
             var entityProps = (from s in storageMetadata where s.BuiltInTypeKind == BuiltInTypeKind.EntityType select s as EntityType);
             var personRightStorageMetadata = (from m in entityProps where m.Name == entityName select m).Single();
 
@@ -124,7 +112,7 @@ namespace CExtensions.EntityFramework
                     {
                         var colName = item.Name;
                         var propertyName = item.MetadataProperties["PreferredName"].Value;
-                        result.Add(new PropertyColumnMapping(colName, propertyName.ToString()));
+                        result.Add(new PropertyColumnMapping(propertyName.ToString(), colName));
                     }
                 }
 
@@ -212,7 +200,7 @@ namespace CExtensions.EntityFramework
 
         public static String MappedTable(this DbContext dbContext, string entityName)
         {
-            string tableName = (from t in dbContext.EntitySets() where t.Name == entityName select t.Table).FirstOrDefault();
+            string tableName = (from t in dbContext.StoreEntitySets() where t.Name.ToUpper() == entityName.ToUpper() select t.Table).FirstOrDefault();
 
             return tableName;
 
@@ -220,7 +208,7 @@ namespace CExtensions.EntityFramework
 
         public static String MappedEntity(this DbContext dbContext, string tableName)
         {
-            string entityName = (from t in dbContext.EntitySets() where t.Table == tableName select t.Name).FirstOrDefault();
+            string entityName = (from t in dbContext.StoreEntitySets() where t.Table.ToUpper() == tableName.ToUpper() select t.Name).FirstOrDefault();
 
             return entityName;
 
@@ -250,12 +238,10 @@ namespace CExtensions.EntityFramework
 
         }
 
-
-
         public static String IdPropertyName(this DbContext dbContext, Type type)
         {
-            var metadata = dbContext.AsObjectContext().MetadataWorkspace
-                                .GetType(type.Name, type.Namespace, System.Data.Entity.Core.Metadata.Edm.DataSpace.CSpace)
+            var metadata = dbContext.MetadataWorkspace()
+                                .GetType(type.Name, type.Namespace, DataSpace.CSpace)
                                 .MetadataProperties;
 
             IEnumerable retval = (IEnumerable)metadata
@@ -335,6 +321,31 @@ namespace CExtensions.EntityFramework
                     }
                 }
             }
+        }
+
+        public static EntityMapping GetMappings(this DbContext dbContext, String TableName)
+        {
+            string entityName = dbContext.MappedEntity(TableName);
+
+            return GetEntityMapping(dbContext, entityName);
+
+        }
+
+        public static EntityMapping GetMappings<T>(this DbContext dbContext) where T : class
+        {
+            Type t = typeof(T);
+
+            return GetEntityMapping(dbContext, t.Name);
+           
+        }
+
+        private static EntityMapping GetEntityMapping(DbContext dbContext, string entityName)
+        {
+            string tableName = dbContext.MappedTable(entityName);
+
+            IEnumerable<PropertyColumnMapping> propertiesMapping = dbContext.MappingTable(entityName);
+
+            return new EntityMapping(entityName, tableName, propertiesMapping);
         }
 
         public static String MappedColumnName(this DbContext dbContext, string entityName, string propertyName)
@@ -435,10 +446,37 @@ namespace CExtensions.EntityFramework
         }
     }
 
+    public class EntityMapping
+    {
+        public EntityMapping(string entityName, string tableName, IEnumerable<PropertyColumnMapping> propertiesMapping)
+        {
+            // TODO: Complete member initialization
+            this.EntityName = entityName;
+            this.TableName = tableName;
+            this.PropertiesMapping = propertiesMapping;
+        }
+        public String EntityName { get; private set; }
+
+        public String TableName { get; private set; }
+
+        public IEnumerable<PropertyColumnMapping> PropertiesMapping { get; private set; }
+
+        public String MappedColumn(string property)
+        {
+            return (from p in PropertiesMapping where p.PropertyName == property select p.ColumnName).FirstOrDefault();
+        }
+
+        public String MappedProperty(string column)
+        {
+            return (from p in PropertiesMapping where p.ColumnName == column select p.PropertyName).FirstOrDefault();
+        }
+
+    }
+
     public struct PropertyColumnMapping
     {
 
-        public PropertyColumnMapping(String columnName, String propertyName)
+        public PropertyColumnMapping(String propertyName, String columnName)
         {
             _columnName = columnName;
             _propertyName = propertyName;

@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="DbContextDumpExtensions.cs" />
     <Compile Include="DbContextExtensions.cs" />
+    <Compile Include="EntityTypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@ using CExtensions.Effort.SampleApp;
 using CExtensions.EntityFramework;
 using CExtensions.Effort;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace CExtensions.EntityFramework.Test
 {
@@ -19,7 +20,7 @@ namespace CExtensions.EntityFramework.Test
             {
                 var result = context.DbSets();
 
-                result.Count.ShouldBe(2);
+                result.Count().ShouldBe(2);
             }
         }
 
@@ -28,7 +29,7 @@ namespace CExtensions.EntityFramework.Test
         {
             using (SampleContext context = new XmlFileContext<SampleContext>(this.GetType()).Empty())
             {
-                var result = context.DbSetFor("Author");
+                var result = context.Set("Author");
 
                 result.ElementType.Name.ShouldBe("Author");
             }
@@ -75,6 +76,33 @@ namespace CExtensions.EntityFramework.Test
 
                 var propertyName = emptyContext1.MappedPropertyName("AUTHOR", "AUT_FIRSTNAME");
                 propertyName.ShouldBe("FirstName");
+            }
+        }
+
+        [Fact]
+        public void ShouldGetMappings()
+        {
+            using (SampleContext emptyContext = new XmlFileContext<SampleContext>(this.GetType()).Empty())
+            {
+                var entityMapping = emptyContext.GetMappings<Author>();
+
+                entityMapping.TableName.ShouldBe("AUTHOR");
+                entityMapping.EntityName.ShouldBe("Author");
+                entityMapping.PropertiesMapping.Count().ShouldBe(4);
+
+                entityMapping.MappedColumn("FirstName").ShouldBe("AUT_FIRSTNAME");
+                entityMapping.MappedProperty("AUT_FIRSTNAME").ShouldBe("FirstName");
+
+                entityMapping.MappedColumn("Id").ShouldBe("AUT_ID");
+                entityMapping.MappedProperty("AUT_ID").ShouldBe("Id");
+
+
+                //from table name
+                entityMapping = emptyContext.GetMappings("AUTHOR");
+
+                entityMapping.TableName.ShouldBe("AUTHOR");
+                entityMapping.EntityName.ShouldBe("Author");
+                entityMapping.PropertiesMapping.Count().ShouldBe(4);
             }
         }
     }
