@@ -34,7 +34,6 @@ namespace CExtensions.Effort
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Found at least " + Differences.Count + " Differences : ");
-            sb.AppendLine("");
             int counter = 1;
             foreach(var diff in Differences)
             {

@@ -35,7 +35,7 @@ namespace CExtensions.Test
 
             using (Service svc = new Service(ctx))
             {
-                string fromFile = await ctx.AsXmlAsync("CExtensions.Effort.SampleApp", ContextDataEnum.All);
+                string fromFile = await ctx.AsXmlAsync(ContextDataEnum.All);
                 dynamic obj = fromFile.XmlToDynamic();
 
                 ((string)obj.AUTHOR[0].AUT_FIRSTNAME).ShouldBe("John");
@@ -54,7 +54,7 @@ namespace CExtensions.Test
 
                 emptyContext.Authors.Attach(aut1);
 
-                string fromFile = await emptyContext.AsXmlAsync("CExtensions.Effort.SampleApp", ContextDataEnum.Local, includeNull: true);
+                string fromFile = await emptyContext.AsXmlAsync(ContextDataEnum.Local, includeNull: true);
 
                 dynamic obj = fromFile.XmlToDynamic();
 

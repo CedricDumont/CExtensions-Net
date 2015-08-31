@@ -214,7 +214,7 @@ namespace CExtensions.EntityFramework
 
         }
 
-        internal static async Task<string> ToXml(this DbContext dbContext, string assemblyName, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, string entityLoLoad = null, object objectEntityId = null, bool includeNull = true)
+        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, string entityLoLoad = null, object objectEntityId = null, bool includeNull = true)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -222,7 +222,7 @@ namespace CExtensions.EntityFramework
 
             if (entityLoLoad.IsNotNullOrEmpty())
             {
-                await WriteDbSet(dbContext, contextData, sb, dbContext.DbSetFor(entityLoLoad, assemblyName), assemblyName, objectEntityId, includeNull: includeNull);
+                await WriteDbSet(dbContext, contextData, sb, dbContext.Set(entityLoLoad), objectEntityId, includeNull: includeNull);
             }
             else
             {
@@ -269,7 +269,7 @@ namespace CExtensions.EntityFramework
             }
         }
 
-        private static async Task WriteDbSet(DbContext dbContext, ContextDataEnum contextData, StringBuilder sb, DbSet dbset, string assemblyName, Object objectId = null, List<string> loadTracker = null, bool includeNull = true)
+        private static async Task WriteDbSet(DbContext dbContext, ContextDataEnum contextData, StringBuilder sb, DbSet dbset, Object objectId = null, List<string> loadTracker = null, bool includeNull = true)
         {
             if (loadTracker == null)
             {
@@ -312,11 +312,11 @@ namespace CExtensions.EntityFramework
 
                         Type type = prop.PropertyType.GetGenericArguments()[0];
 
-                        DbSet set = dbContext.DbSetFor(type.Name, assemblyName);
+                        DbSet set = dbContext.Set(type.Name);
 
                         if (set != null)
                         {
-                            await WriteCollection(sb, linkedCollection, dbContext, type.Name, loadTracker, assemblyName);
+                            await WriteCollection(sb, linkedCollection, dbContext, type.Name, loadTracker);
                         }
                     }
                 }
@@ -371,7 +371,7 @@ namespace CExtensions.EntityFramework
         }
 
 
-        private static async Task WriteCollection(StringBuilder sb, IEnumerable items, DbContext dbContext, String elementName, List<string> loadTracker, string assemblyName)
+        private static async Task WriteCollection(StringBuilder sb, IEnumerable items, DbContext dbContext, String elementName, List<string> loadTracker)
         {
 
             if (items == null)
@@ -381,13 +381,13 @@ namespace CExtensions.EntityFramework
 
             foreach (var item in items)
             {
-                DbSet dbset = dbContext.DbSetFor(elementName, assemblyName);
+                DbSet dbset = dbContext.Set(elementName);
 
                 string columnIdName = dbContext.IdPropertyName(dbset.ElementType);
 
                 object idVal = item.GetPrimitivePropertyValue(columnIdName);
 
-                await WriteDbSet(dbContext, ContextDataEnum.All, sb, dbset, assemblyName, idVal, loadTracker);
+                await WriteDbSet(dbContext, ContextDataEnum.All, sb, dbset, idVal, loadTracker);
 
             }
 

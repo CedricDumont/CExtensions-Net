@@ -44,7 +44,7 @@ namespace CExtensions.EntityFramework
             {
                 using (StreamWriter sw = new StreamWriter(fileStream))
                 {
-                    string result = await dbContext.ToXml(assemblyName, root, contextData, entityName, id, includeNull);
+                    string result = await dbContext.ToXml(root, contextData, entityName, id, includeNull);
                     await sw.WriteAsync(result.FormatXml());
                 }
             }
@@ -53,14 +53,13 @@ namespace CExtensions.EntityFramework
        
         public static async Task<string> AsXmlAsync(
             this DbContext dbContext, 
-            string assemblyName, 
             ContextDataEnum contextData = ContextDataEnum.Local,
             string root = "Root",
             string entityToLoad = null,
             object objectEntityId = null,
             bool includeNull = false)
         {
-            return ((await dbContext.ToXml(assemblyName, root, contextData, entityToLoad, objectEntityId,includeNull)).FormatXml());
+            return ((await dbContext.ToXml(root, contextData, entityToLoad, objectEntityId,includeNull)).FormatXml());
         }
 
 

@@ -46,7 +46,31 @@ namespace CExtensions.EntityFramework.Test
 
                     comparisonResult.AreEqual.ShouldBe(true, comparisonResult.ToString());
                 }
+            }
+        }
 
+        [Fact]
+        public async Task ShouldCompareTwoContextWithSimpleContent()
+        {
+            using (SampleContext expectedContext = GetSimpleTestContext())
+            {
+                using (SampleContext appContext = new XmlFileContext<SampleContext>(this.GetType()).Empty())
+                {
+                    appContext.Authors.Add(new Author() {  FirstName = "Cedric123" });
+                    appContext.SaveChanges();
+                   
+                    //compare context
+                    var comparisonResult = await appContext.CompareTo(expectedContext);
+
+                    string s = await appContext.AsXmlAsync();
+                    string s2 = await expectedContext.AsXmlAsync(ContextDataEnum.All);
+
+                    comparisonResult.AreEqual.ShouldBe(false, comparisonResult.ToString());
+                    comparisonResult.Differences.Count.ShouldBe(2);
+                    comparisonResult.Differences[0].ToString()
+                        .ShouldBe("Author.FirstName Should be [Cedric] but was [Cedric123] - object with AUT_ID : 1");
+
+                }
             }
         }
 
@@ -103,6 +127,19 @@ namespace CExtensions.EntityFramework.Test
                 entityMapping.Entity.ShouldBe("Author");
                 entityMapping.ClrType.ShouldBe(typeof(Author));
             }
+        }
+
+        public SampleContext GetSimpleTestContext()
+        {
+            SampleContext simpleContext = new XmlFileContext<SampleContext>(this.GetType()).Empty();
+            
+            Author cedric = new Author() { FirstName = "Cedric", LastName = "Dumont" };
+
+            simpleContext.Authors.Add(cedric);
+
+            simpleContext.SaveChanges();
+
+            return simpleContext;
         }
     }
 }

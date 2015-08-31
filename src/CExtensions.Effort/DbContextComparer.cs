@@ -78,7 +78,7 @@ namespace CExtensions.Effort
         }
 
 
-        public static async Task<DbContextCheckResult> Compare(DbContext expectedctx, DbContext actualContext, string assemblyName = null, string[] ignoreFields = null)
+        public static async Task<DbContextCheckResult> Compare(DbContext expectedctx, DbContext actualContext, params string[] ignoreFields)
         {
             IEnumerable<DbSet> expectedDbSets = expectedctx.DbSets();
 
@@ -163,9 +163,9 @@ namespace CExtensions.Effort
 
     public static class DbContextCompareExtensions
     {
-        public static async Task<DbContextCheckResult> CompareTo(this DbContext dbcontext, DbContext expectedContext, string assemblyName = null, string[] ignoredProperties = null)
+        public static async Task<DbContextCheckResult> CompareTo(this DbContext dbcontext, DbContext expectedContext, params string[] ignoredProperties)
         {
-            return await DbContextComparer.Compare(expectedContext, dbcontext, assemblyName, ignoredProperties);
+            return await DbContextComparer.Compare(expectedContext, dbcontext, ignoredProperties);
         }
 
 
