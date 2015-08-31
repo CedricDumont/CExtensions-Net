@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CExtensions.Effort
+namespace CExtensions.EntityFramework
 {
     public class DbContextCheckResult
     {

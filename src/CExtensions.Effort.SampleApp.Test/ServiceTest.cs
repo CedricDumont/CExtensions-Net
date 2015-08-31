@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using Shouldly;
 using System.Threading.Tasks;
+using CExtensions.EntityFramework;
 
 namespace CExtensions.Effort.SampleApp.Test
 {

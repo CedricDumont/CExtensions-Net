@@ -7,7 +7,7 @@ using System.Reflection;
 using System.ComponentModel.DataAnnotations.Schema;
 using CExtensions.EntityFramework;
 
-namespace CExtensions.Effort
+namespace CExtensions.EntityFramework
 {
 
     internal class DbContextComparer

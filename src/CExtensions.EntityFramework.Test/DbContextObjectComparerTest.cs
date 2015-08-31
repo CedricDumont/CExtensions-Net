@@ -8,7 +8,7 @@ using Xunit;
 using CExtensions.Effort.SampleApp;
 using CExtensions.Effort;
 
-namespace CExtensions.Test
+namespace CExtensions.EntityFramework
 {
     public class DbContextObjectComparerTest
     {
