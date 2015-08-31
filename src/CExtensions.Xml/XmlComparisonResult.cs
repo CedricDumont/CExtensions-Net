@@ -9,6 +9,6 @@ namespace CExtensions.Xml
     {
         public bool AreEqual { get; set; }
 
-        public IEnumerable<String> Errors { get; set; }
+        public IEnumerable<String>  Errors { get; set; }
     }
 }

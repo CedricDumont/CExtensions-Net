@@ -3,7 +3,7 @@
   <metadata>
     <version>$version$</version>
     <authors>Dumont Cedric</authors>
-    <owners />
+    <owners>Dumont Cedric</owners>
     <id>$id$</id>
     <title>CExtensions.Xml</title>
     <projectUrl>https://github.com/CExtensions/Net-Common</projectUrl>
