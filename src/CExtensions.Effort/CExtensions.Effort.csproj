@@ -33,6 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CExtensions.Common, Version=1.1.5721.13667, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CExtensions.Common.1.1.0-CI00014\lib\net45\CExtensions.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="CExtensions.EntityFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CExtensions.EntityFramework.1.1.0-CI00014\lib\net45\CExtensions.EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="Effort, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
       <HintPath>..\packages\Effort.EF6.1.1.4\lib\net45\Effort.dll</HintPath>
       <Private>True</Private>
@@ -79,16 +87,6 @@
     <None Include="App.config" />
     <None Include="CExtensions.Effort.nuspec" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CExtensions.Common\CExtensions.Common.csproj">
-      <Project>{c710dda4-8901-4d9a-be63-ad7dc134df1f}</Project>
-      <Name>CExtensions.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CExtensions.EntityFramework\CExtensions.EntityFramework.csproj">
-      <Project>{7f682122-0e9a-4181-8103-25e268fa6ff2}</Project>
-      <Name>CExtensions.EntityFramework</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

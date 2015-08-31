@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CExtensions.Common, Version=1.1.5721.13667, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CExtensions.Common.1.1.0-CI00014\lib\net45\CExtensions.Common.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -61,10 +65,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CExtensions.Common\CExtensions.Common.csproj">
-      <Project>{c710dda4-8901-4d9a-be63-ad7dc134df1f}</Project>
-      <Name>CExtensions.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CExtensions.Xml\CExtensions.Xml.csproj">
       <Project>{dc38d433-3b8d-4672-87a4-e37a1f699fe8}</Project>
       <Name>CExtensions.Xml</Name>
