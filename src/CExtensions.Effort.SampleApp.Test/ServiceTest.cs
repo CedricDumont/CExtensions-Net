@@ -9,7 +9,6 @@ namespace CExtensions.Effort.SampleApp.Test
 {
     public class ServiceTest
     {
-        private string _modelNamespace = "CExtensions.Effort.SampleApp";
 
         [Fact(DisplayName="Should return all posts")]
         public void Should_Return_All_Posts()
@@ -34,8 +33,7 @@ namespace CExtensions.Effort.SampleApp.Test
                 {
                     svc.DeletPostWithId(1);
 
-                    var result  = await ctx.CompareTo(GetExpectedContext("test1"), 
-                                         _modelNamespace);
+                    var result  = await ctx.CompareTo(GetExpectedContext("test1"));
 
                     result.AreEqual.ShouldBe(true, result.ToString());
                 }
@@ -56,8 +54,7 @@ namespace CExtensions.Effort.SampleApp.Test
                     
                     ctx.SaveChanges();
 
-                    var result = await ctx.CompareTo(GetExpectedContext("test2"),
-                                         _modelNamespace);
+                    var result = await ctx.CompareTo(GetExpectedContext("test2"));
 
 
                     result.AreEqual.ShouldBe(true, result.ToString());
