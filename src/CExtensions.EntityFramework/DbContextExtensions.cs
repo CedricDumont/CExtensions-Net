@@ -238,22 +238,54 @@ namespace CExtensions.EntityFramework
 
         }
 
-        public static String IdPropertyName(this DbContext dbContext, Type type)
+        public static String PrimaryKeyColumnFor(this DbContext dbContext, Type type)
         {
-            var metadata = dbContext.MetadataWorkspace()
-                                .GetType(type.Name, type.Namespace, DataSpace.CSpace)
-                                .MetadataProperties;
+            var set = dbContext.StoreEntitySets().Where(s => s.ElementType.Name == type.Name).FirstOrDefault();
 
-            IEnumerable retval = (IEnumerable)metadata
-                                .Where(mp => mp.Name == "KeyMembers")
-                                .First()
-                                .Value;
+            IEnumerable<string> keyNames = set.ElementType
+                                                        .KeyMembers
+                                                        .Select(k => k.Name);
 
-            foreach (var i in retval)
-            {
-                return i.ToString();
-            }
-            return null;
+            return keyNames.FirstOrDefault();
+        }
+
+        public static String KeyMemberFor(this DbContext dbContext, Type type)
+        {
+            var set = dbContext.EntitySets().Where(s => s.ElementType.Name == type.Name).FirstOrDefault();
+
+            IEnumerable<string> keyNames = set.ElementType
+                                                        .KeyMembers
+                                                        .Select(k => k.Name);
+
+            return keyNames.FirstOrDefault();
+
+            #region old code
+            //try
+            //{
+
+            //    var metadata = dbContext.MetadataWorkspace()
+            //                        .GetType(type.Name, type.Namespace, DataSpace.CSpace)
+            //                        .MetadataProperties;
+           
+
+            //IEnumerable retval = (IEnumerable)metadata
+            //                    .Where(mp => mp.Name == "KeyMembers")
+            //                    .First()
+            //                    .Value;
+
+            //foreach (var i in retval)
+            //{
+            //    return i.ToString();
+            //}
+            //return null;
+            //}
+            //catch (Exception ex)
+            //{
+            //    var s = ex.Data;
+            //}
+            //return null;
+
+            #endregion
         }
 
         private static Boolean CanWrite(this List<string> container, string key)
@@ -383,7 +415,7 @@ namespace CExtensions.EntityFramework
             {
                 DbSet dbset = dbContext.Set(elementName);
 
-                string columnIdName = dbContext.IdPropertyName(dbset.ElementType);
+                string columnIdName = dbContext.KeyMemberFor(dbset.ElementType);
 
                 object idVal = item.GetPrimitivePropertyValue(columnIdName);
 

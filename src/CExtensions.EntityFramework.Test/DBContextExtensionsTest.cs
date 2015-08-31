@@ -129,7 +129,26 @@ namespace CExtensions.EntityFramework.Test
             }
         }
 
-        public SampleContext GetSimpleTestContext()
+        [Fact]
+        public void ShouldReturnPrimaryKeyName()
+        {
+            using (SampleContext emptyContext1 = new XmlFileContext<SampleContext>(this.GetType()).Empty())
+            {
+                var pkName = emptyContext1.KeyMemberFor(typeof(Author));
+                pkName.ShouldBe("Id");
+                
+                pkName = emptyContext1.KeyMemberFor(typeof(Post));
+                pkName.ShouldBe("Id");
+
+                var pkColumnFor = emptyContext1.PrimaryKeyColumnFor(typeof(Author));
+                pkColumnFor.ShouldBe("AUT_ID");
+
+                pkColumnFor = emptyContext1.PrimaryKeyColumnFor(typeof(Post));
+                pkColumnFor.ShouldBe("Post_Id");
+            }
+        }
+
+        private SampleContext GetSimpleTestContext()
         {
             SampleContext simpleContext = new XmlFileContext<SampleContext>(this.GetType()).Empty();
             

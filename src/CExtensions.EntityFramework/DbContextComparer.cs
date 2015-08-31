@@ -99,9 +99,10 @@ namespace CExtensions.EntityFramework
                 {
                     Object actualObject = null;
 
-                    var idProp = expectedctx.IdPropertyName(dbSet.ElementType);
+                    var idProp = expectedctx.KeyMemberFor(dbSet.ElementType);
 
                     var prop = expectedObject.GetType().GetProperty(idProp, BindingFlags.Public | BindingFlags.Instance);
+                   
                     if (prop != null)
                     {
 
