@@ -89,10 +89,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CExtensions.Effort.SampleApp\CExtensions.Effort.SampleApp.csproj">
-      <Project>{8442a366-1ae3-419e-95c7-ff9aeb68c284}</Project>
-      <Name>CExtensions.Effort.SampleApp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CExtensions.Effort\CExtensions.Effort.csproj">
       <Project>{0d71d2c6-7c3e-405e-b724-7751ac738a3a}</Project>
       <Name>CExtensions.Effort</Name>

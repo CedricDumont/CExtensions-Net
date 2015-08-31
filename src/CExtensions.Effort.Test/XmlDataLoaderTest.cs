@@ -1,4 +1,4 @@
-﻿using CExtensions.Effort.SampleApp;
+﻿using CExtensions.Test.Model;
 using Effort.DataLoaders;
 using System;
 using System.Collections.Generic;

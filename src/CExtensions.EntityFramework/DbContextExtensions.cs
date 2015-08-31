@@ -48,6 +48,7 @@ namespace CExtensions.EntityFramework
             return sets;
         }
 
+
         public static IList<EntitySet> EntitySets(this DbContext dbContext)
         {
             EntityContainerMapping mapping = dbContext.MetadataWorkspace().GetItems<EntityContainerMapping>(DataSpace.CSSpace)
@@ -91,7 +92,9 @@ namespace CExtensions.EntityFramework
 
         public static DbSet Set(this DbContext dbContext, String entityName)
         {
-            var dbSet = (from dbs in dbContext.DbSets() where dbs.ElementType.Name == entityName select dbs).FirstOrDefault();
+            var dbSet = (from dbs in dbContext.DbSets() 
+                         where dbs.ElementType.Name == entityName select dbs)
+                         .FirstOrDefault();
 
             return dbSet;
         }
@@ -238,20 +241,24 @@ namespace CExtensions.EntityFramework
 
         }
 
-        public static String PrimaryKeyColumnFor(this DbContext dbContext, Type type)
+        public static String PrimaryKeyColumnFor(this DbContext dbContext, Type clrType)
         {
-            var set = dbContext.StoreEntitySets().Where(s => s.ElementType.Name == type.Name).FirstOrDefault();
+            var set = dbContext.StoreEntitySets().Where(s => s.ElementType.Name == clrType.Name).FirstOrDefault();
 
             IEnumerable<string> keyNames = set.ElementType
-                                                        .KeyMembers
-                                                        .Select(k => k.Name);
+                                                .KeyMembers
+                                                .Select(k => k.Name);
 
             return keyNames.FirstOrDefault();
         }
 
-        public static String KeyMemberFor(this DbContext dbContext, Type type)
+
+
+        public static String KeyMemberFor(this DbContext dbContext, Type clrType)
         {
-            var set = dbContext.EntitySets().Where(s => s.ElementType.Name == type.Name).FirstOrDefault();
+            var set = dbContext.EntitySets().Where(s => s.ElementType.Name == clrType.Name).FirstOrDefault();
+
+
 
             IEnumerable<string> keyNames = set.ElementType
                                                         .KeyMembers

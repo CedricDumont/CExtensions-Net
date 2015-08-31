@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using Shouldly;
-using CExtensions.Effort.SampleApp;
+using CExtensions.Test.Model;
 using CExtensions.EntityFramework;
 using CExtensions.Effort;
 using System.Threading.Tasks;
@@ -130,7 +130,7 @@ namespace CExtensions.EntityFramework.Test
         }
 
         [Fact]
-        public void ShouldReturnPrimaryKeyName()
+        public void ShouldReturnPrimaryKeyMemberandColumnName()
         {
             using (SampleContext emptyContext1 = new XmlFileContext<SampleContext>(this.GetType()).Empty())
             {

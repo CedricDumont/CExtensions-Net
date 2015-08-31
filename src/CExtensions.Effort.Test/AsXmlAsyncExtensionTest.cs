@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
 using CExtensions.Effort;
 using Xunit;
-using CExtensions.Effort.SampleApp;
+using CExtensions.Test.Model;
 using CExtensions.EntityFramework;
 using System.Xml;
 using Shouldly;
@@ -31,10 +31,8 @@ namespace CExtensions.Test
             //load a context
             XmlFileContext<SampleContext> xmlFileCtx = new XmlFileContext<SampleContext>(this.GetType());
 
-            SampleContext ctx = xmlFileCtx.InputContext("test1");
+            using (SampleContext ctx = xmlFileCtx.InputContext("test1")) { 
 
-            using (Service svc = new Service(ctx))
-            {
                 string fromFile = await ctx.AsXmlAsync(ContextDataEnum.All);
                 dynamic obj = fromFile.XmlToDynamic();
 

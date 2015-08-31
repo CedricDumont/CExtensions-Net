@@ -105,13 +105,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CExetnsions.Test.Model\CExtensions.Test.Model.csproj">
+      <Project>{36cdd704-b748-4224-a9dc-3ba11ad5ea07}</Project>
+      <Name>CExtensions.Test.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CExtensions.Common\CExtensions.Common.csproj">
       <Project>{c710dda4-8901-4d9a-be63-ad7dc134df1f}</Project>
       <Name>CExtensions.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CExtensions.Effort.SampleApp\CExtensions.Effort.SampleApp.csproj">
-      <Project>{8442a366-1ae3-419e-95c7-ff9aeb68c284}</Project>
-      <Name>CExtensions.Effort.SampleApp</Name>
     </ProjectReference>
     <ProjectReference Include="..\CExtensions.Effort\CExtensions.Effort.csproj">
       <Project>{0d71d2c6-7c3e-405e-b724-7751ac738a3a}</Project>

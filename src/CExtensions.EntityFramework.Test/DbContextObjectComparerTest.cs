@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using CExtensions;
 using Shouldly;
 using Xunit;
-using CExtensions.Effort.SampleApp;
 using CExtensions.Effort;
+using CExtensions.Test.Model;
 
 namespace CExtensions.EntityFramework
 {
