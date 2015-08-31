@@ -122,16 +122,30 @@ namespace CExtensions.Effort
                         }
                         else
                         {
-                            ComparisonResult cr = DbContextComparer.CompareObjects(expectedObject, actualObject, ignoredMembers);
-
-                            if (!cr.AreEqual)
+                            //Issue #1 : we should only check for entity that have unchanged state.
+                            if(actualContext.Entry(actualObject).State ==
+                                expectedctx.Entry(expectedObject).State)
                             {
-                                string columnName = expectedctx.MappedColumnName(dbSet.ElementType.Name, prop.Name);
-                                return new DbContextCheckResult(false,
-                                    cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name, actualObject, columnName));
+                                ComparisonResult cr = DbContextComparer.CompareObjects(expectedObject, actualObject, ignoredMembers);
+
+                                if (!cr.AreEqual)
+                                {
+                                    string columnName = expectedctx.MappedColumnName(dbSet.ElementType.Name, prop.Name);
+                                    return new DbContextCheckResult(false,
+                                        cr.Differences.ToDbContextCheckEntry(idValue.ToString(), dbSet.ElementType.Name, actualObject, columnName));
+                                }
+                            }
+                            else
+                            {
+                                 string columnName = actualContext.MappedColumnName(dbSet.ElementType.Name, prop.Name);
+                                 DbContextCheckEntry entry =
+                                     DbContextCheckEntry
+                                     .ForObject(idValue.ToString(), dbSet.ElementType.Name, actualObject, columnName)
+                                     .WithProperty("EntityState").Was(actualContext.Entry(actualObject).State.ToString())
+                                     .InsteadOf(expectedctx.Entry(expectedObject).State.ToString());
+                                 return new DbContextCheckResult(false, entry);
                             }
                         }
-
                     }
                 }
             }

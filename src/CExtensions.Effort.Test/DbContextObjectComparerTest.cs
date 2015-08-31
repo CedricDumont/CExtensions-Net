@@ -13,7 +13,6 @@ namespace CExtensions.Test
     public class DbContextObjectComparerTest
     {
 
-        private string _assemblyName = "CExtensions.Effort.SampleApp";
 
         [Fact]
         public async Task ShouldReturnTrueForSameContextComparison()
@@ -23,7 +22,7 @@ namespace CExtensions.Test
             SampleContext ctx1 = xmlFileCtx.InputContext("test1");
             SampleContext ctx2 = xmlFileCtx.InputContext("test1");
 
-            var result = await ctx1.CompareTo(ctx2, _assemblyName);
+            var result = await ctx1.CompareTo(ctx2);
 
             result.AreEqual.ShouldBe(true);
 
@@ -39,7 +38,7 @@ namespace CExtensions.Test
             SampleContext ctx1 = xmlFileCtx.InputContext("test1");
             SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test1");
 
-            var result = await ctx1.CompareTo(ctx2, _assemblyName);
+            var result = await ctx1.CompareTo(ctx2);
 
             result.AreEqual.ShouldBe(false);
         }
@@ -54,11 +53,33 @@ namespace CExtensions.Test
             SampleContext ctx1 = xmlFileCtx.InputContext("test3");
             SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test3");
 
-            var result = await ctx1.CompareTo(ctx2, _assemblyName);
+            var result = await ctx1.CompareTo(ctx2);
 
             result.AreEqual.ShouldBe(false);
             result.Differences.Count.ShouldBe(1);
             result.Differences[0].ToString().ShouldBe("Author was null - object with AUT_ID : 2 (we couldn't find an actual object with expected id  : 2 - this can be caused because the id is auto generated. You could adapt the ids of the expected object)");
+
+        }
+
+        [Fact]
+        public async Task ShouldBeFalseWhenEntityStateAreDifferent()
+        {
+            XmlFileContext<SampleContext> xmlFileCtx = new XmlFileContext<SampleContext>(this.GetType());
+            XmlFileContext<SampleContext> xmlFileExpectedCtx = new XmlFileContext<SampleContext>(this.GetType());
+
+            SampleContext ctx1 = xmlFileCtx.InputContext("test4");
+            SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test4");
+            SampleContext ctx3 = xmlFileExpectedCtx.ExpectedContext("test4b");
+
+            var auth = ctx1.Authors.Find((decimal)1);
+            auth.FirstName = "cedric";
+            
+            var result = await ctx1.CompareTo(ctx2);
+            result.AreEqual.ShouldBe(false, result.ToString());
+
+            ctx1.SaveChanges();
+            result = await ctx1.CompareTo(ctx3);
+            result.AreEqual.ShouldBe(true, result.ToString());
 
         }
 
@@ -72,7 +93,7 @@ namespace CExtensions.Test
             SampleContext ctx1 = xmlFileCtx.InputContext("test2");
             SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test2");
 
-            var result = await ctx1.CompareTo(ctx2, _assemblyName);
+            var result = await ctx1.CompareTo(ctx2);
 
             result.AreEqual.ShouldBe(false);
             result.Differences.Count.ShouldBe(2);
