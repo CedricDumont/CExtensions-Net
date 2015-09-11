@@ -23,34 +23,6 @@ namespace CExtensions.EntityFramework
     }
     public static class DbContextDumpExtensions
     {
-
-        
-        public static async Task WriteXmlAsync(
-            this DbContext dbContext,
-            string assemblyName, 
-            string file,
-            ContextDataEnum contextData = ContextDataEnum.Local, 
-            string root = "Root", 
-            Boolean append = false, 
-            string entityName = null, 
-            Object id = null,
-            bool includeNull = false)
-        {
-            FileInfo fi = new FileInfo(file);
-
-            FileMode fileMode = append ? FileMode.Append : FileMode.Create;
-
-            using (var fileStream = new FileStream(file, fileMode))
-            {
-                using (StreamWriter sw = new StreamWriter(fileStream))
-                {
-                    string result = await dbContext.ToXml(root, contextData, entityName, id, includeNull);
-                    await sw.WriteAsync(result.FormatXml());
-                }
-            }
-        }
-
-       
         public static async Task<string> AsXmlAsync(
             this DbContext dbContext, 
             ContextDataEnum contextData = ContextDataEnum.Local,
