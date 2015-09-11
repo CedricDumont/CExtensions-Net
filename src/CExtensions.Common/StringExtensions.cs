@@ -64,11 +64,22 @@ namespace System
 
         public static string Right(this string str, int length)
         {
+            if(length < 0)
+            {
+                length = 0;
+            }
+
+            length = Math.Min(str.Length, length);
+
             return str.Substring(str.Length - length, length);
         }
 
         public static string Left(this string str, int length)
         {
+            if(length < 0)
+            {
+                length = 0;
+            }
             return str.Substring(0, Math.Min(str.Length, length));
         }
 

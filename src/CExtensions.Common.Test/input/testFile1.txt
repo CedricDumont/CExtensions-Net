@@ -1,0 +1,5 @@
+﻿first line
+second line
+/n
+\n
+some other line with \n and some text after

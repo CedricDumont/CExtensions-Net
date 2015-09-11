@@ -68,6 +68,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DateTimeExtensionsTest.cs" />
+    <Compile Include="FileContentEnumeratorTest.cs" />
+    <Compile Include="FileExtensionsTest.cs" />
     <Compile Include="StringExtensionsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -79,6 +81,16 @@
       <Project>{c710dda4-8901-4d9a-be63-ad7dc134df1f}</Project>
       <Name>CExtensions.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Test.Helper\Test.Helper.csproj">
+      <Project>{e482f0df-10a7-4307-a5ad-eb7700786ffa}</Project>
+      <Name>Test.Helper</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="input\testFile1.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
