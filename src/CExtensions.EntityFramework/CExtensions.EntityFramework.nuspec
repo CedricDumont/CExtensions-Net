@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>CExtensions.Xml</title>
+    <title>CExtensions.EntityFramework</title>
     <authors>Dumont Cedric</authors>
     <owners>Dumont Cedric</owners>
     <projectUrl>https://github.com/CExtensions/Net-Common</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Xml Extensions and Helpers for all Cextensions projects in .net</description>
-    <summary>Xml Extensions and Helpers for all Cextensions projects in .net</summary>
+    <description>Entity Framework Extensions and Helpers for all Cextensions projects in .net</description>
+    <summary>Entity Framework Extensions and Helpers for all Cextensions projects in .net</summary>
     <copyright>Copyright 2015</copyright>
     <tags>.NET Extensions</tags>
   </metadata>
