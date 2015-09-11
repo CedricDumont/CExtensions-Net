@@ -17,6 +17,10 @@ namespace CExtensions.Common.IO
 
         FileInfo _fi;
 
+        public Boolean _open = false;
+
+        public int _count;
+
 
         public FileContentEnumerator(String filePath)
             : this(new FileInfo(filePath))
@@ -27,6 +31,7 @@ namespace CExtensions.Common.IO
         public FileContentEnumerator(FileInfo fi)
         {
             _fi = fi;
+            _count = Convert.ToInt32(_fi.CountLines());
             Reset();
         }
 
@@ -50,11 +55,19 @@ namespace CExtensions.Common.IO
 
         public bool MoveNext()
         {
-            _current = _reader.ReadLine();
+            try
+            {
+                _current = _reader.ReadLine();
+                CurrentIteration++;
+            }
+            catch(ObjectDisposedException)
+            {
+                _current = null;
+            }
 
             if(_current == null)
             {
-                _reader.Close();
+                Close();
                 return false;
             }
             return true;
@@ -62,13 +75,23 @@ namespace CExtensions.Common.IO
 
         public void Reset()
         {
-            try
-            {
-                _reader.Close();
-            }
-            catch (Exception ex) { }
+            Close();
 
             _reader = _fi.OpenText();
+
+            _open = true;
+        }
+
+        public void Close()
+        {
+            if(_reader != null)
+            {
+                _reader.Close();
+                _reader.Dispose();
+            }
+
+            CurrentIteration = 0;
+            _open = false;
         }
 
         public IEnumerator<string> GetEnumerator()
@@ -79,6 +102,28 @@ namespace CExtensions.Common.IO
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this;
+        }
+
+        public bool IsOpen
+        {
+            get
+            {
+                return _open;
+            }
+        }
+
+        public int Count
+        {
+            get
+            {
+                return _count;
+            }
+        }
+
+        public int CurrentIteration
+        {
+            get;
+            private set;
         }
     }
 }
