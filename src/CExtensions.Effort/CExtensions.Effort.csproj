@@ -72,11 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XmlDataLoader.cs" />
     <Compile Include="XmlFileContext.cs" />
-    <Compile Include="XmlFileReference.cs" />
-    <Compile Include="XmlFileSource.cs" />
-    <Compile Include="XmlTableDataLoaderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
