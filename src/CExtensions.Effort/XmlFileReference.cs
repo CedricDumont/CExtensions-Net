@@ -1,34 +1,34 @@
-﻿using Effort.DataLoaders;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿//using Effort.DataLoaders;
+//using System;
+//using System.Collections.Generic;
+//using System.IO;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
 
-namespace CExtensions.Effort
-{
-    public class XmlFileReference : IFileReference
-    {
+//namespace CExtensions.Effort
+//{
+//    public class XmlFileReference : IFileReference
+//    {
 
-        private String _content;
+//        private String _content;
 
-        public XmlFileReference(String s)
-        {
-            _content = s;
-        }
-        public bool Exists
-        {
-            get {
-                return true;
-            }
-        }
+//        public XmlFileReference(String s)
+//        {
+//            _content = s;
+//        }
+//        public bool Exists
+//        {
+//            get {
+//                return true;
+//            }
+//        }
 
-        public System.IO.Stream Open()
-        {
-            return _content.AsStream();
-        }
+//        public System.IO.Stream Open()
+//        {
+//            return _content.AsStream();
+//        }
 
        
-    }
-}
+//    }
+//}

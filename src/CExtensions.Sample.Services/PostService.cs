@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CExtensions.Sample.Model;
 using AutoMapper;
-using CExtensions.Sample.Services.Dto;
+using CExtensions.Sample.Dal;
+using CExtensions.Sample.Dto;
 
 namespace CExtensions.Sample.Services
 {
@@ -31,7 +32,7 @@ namespace CExtensions.Sample.Services
         }
 
 
-        public void DeletPostWithId(decimal id)
+        public void DeletPostWithId(Int64 id)
         {
             var post = myContext.Posts.Find(id);
 
@@ -41,6 +42,16 @@ namespace CExtensions.Sample.Services
             }
 
             myContext.Posts.Remove(post);
+            myContext.SaveChanges();
+        }
+
+        public void CreateNewPost(Int64 autid, String postSubject, String postBody)
+        {
+            var post = myContext.Posts.Create<Post>();
+            post.AutId = autid;
+            post.Subject = postSubject;
+            post.Body = postBody;
+            myContext.Posts.Add(post);
             myContext.SaveChanges();
         }
     }

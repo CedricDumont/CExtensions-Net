@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CExtensions.Sample.Services.Dto
+namespace CExtensions.Sample.Dto
 {
     public class PostDto
     {

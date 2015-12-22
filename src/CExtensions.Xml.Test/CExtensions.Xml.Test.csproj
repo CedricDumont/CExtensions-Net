@@ -80,6 +80,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CExetnsions.Test.Model\CExtensions.Test.Model.csproj">
+      <Project>{36cdd704-b748-4224-a9dc-3ba11ad5ea07}</Project>
+      <Name>CExtensions.Test.Model</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CExtensions.Xml\CExtensions.Xml.csproj">
       <Project>{dc38d433-3b8d-4672-87a4-e37a1f699fe8}</Project>
       <Name>CExtensions.Xml</Name>

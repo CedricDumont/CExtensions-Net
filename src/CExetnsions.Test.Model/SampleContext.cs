@@ -27,7 +27,7 @@ namespace CExtensions.Test.Model
         }
 
         public SampleContext()
-            : base("Name=SampleContext")
+            //: base("Name=SampleContext")
         {
         }
 

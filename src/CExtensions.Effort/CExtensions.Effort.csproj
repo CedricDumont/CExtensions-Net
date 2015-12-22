@@ -39,8 +39,8 @@
     <Reference Include="CExtensions.EntityFramework">
       <HintPath>..\packages\CExtensions.EntityFramework.1.1.0-CI00022\lib\net45\CExtensions.EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="Effort, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.EF6.1.1.4\lib\net45\Effort.dll</HintPath>
+    <Reference Include="Effort.Next, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Effort.Next.1.1.0-CI00022\lib\net45\Effort.Next.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -79,7 +79,9 @@
     <Compile Include="XmlTableDataLoaderFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="CExtensions.Effort.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

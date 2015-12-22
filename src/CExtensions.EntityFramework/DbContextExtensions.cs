@@ -252,6 +252,17 @@ namespace CExtensions.EntityFramework
             return keyNames.FirstOrDefault();
         }
 
+        public static String PrimaryKeyColumnFor(this DbContext dbContext, String TableName)
+        {
+            var set = dbContext.StoreEntitySets().Where(s => s.Table == TableName).FirstOrDefault();
+
+            IEnumerable<string> keyNames = set.ElementType
+                                                .KeyMembers
+                                                .Select(k => k.Name);
+
+            return keyNames.FirstOrDefault();
+        }
+
 
 
         public static String KeyMemberFor(this DbContext dbContext, Type clrType)
@@ -407,6 +418,18 @@ namespace CExtensions.EntityFramework
             string colName = (from m in mapping where m.ColumnName == columnName select m.PropertyName).FirstOrDefault();
 
             return colName;
+        }
+
+        public static IEnumerable<String> TableNames(this DbContext dbContext)
+        {
+            var tableNames = from t in dbContext.StoreEntitySets() select t.Table;
+
+            List<string> result = tableNames.ToList();
+
+            result.RemoveAll(item => item == null);
+
+            return result;
+
         }
 
 

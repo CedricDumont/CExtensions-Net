@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CExtensions.Sample.Services
+namespace CExtensions.Sample.Dto
 {
     public class AuthorDto
     {

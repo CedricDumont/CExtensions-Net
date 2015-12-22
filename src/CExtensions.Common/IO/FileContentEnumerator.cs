@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CExtensions.Common.IO
 {
 
-    public class FileContentEnumerator : IEnumerator<string>, IEnumerable<string>
+    public class FileContentEnumerator : IEnumerator<string>, IReadOnlyCollection<string>
     {
         StreamReader _reader;
 

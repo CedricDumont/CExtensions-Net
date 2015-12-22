@@ -15,7 +15,7 @@ using DatabaseGeneratedOption = System.ComponentModel.DataAnnotations.Schema.Dat
 using System.Data.Common;
 using CExtensions.Sample.Model;
 
-namespace CExtensions.Sample.Services
+namespace CExtensions.Sample.Dal
 {
     public class SampleContext : DbContext
     {
@@ -28,7 +28,7 @@ namespace CExtensions.Sample.Services
         }
 
         public SampleContext()
-            : base("Name=SampleContext")
+          //  : base("Name=SampleContext")
         {
         }
 
