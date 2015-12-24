@@ -20,7 +20,7 @@ namespace CExtensions.EntityFramework.Test
             {
                 var result = context.DbSets();
 
-                result.Count().ShouldBe(2);
+                result.Count().ShouldBe(3);
             }
         }
 

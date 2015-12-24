@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Effort.Next, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.Next.1.1.0-CI00022\lib\net45\Effort.Next.dll</HintPath>
+      <HintPath>..\packages\Effort.Next.1.1.0-CI00026\lib\net45\Effort.Next.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework">
@@ -57,8 +57,9 @@
     <Reference Include="KellermanSoftware.Compare-NET-Objects">
       <HintPath>..\packages\CompareNETObjects.3.02.0.0\lib\net45\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
     </Reference>
-    <Reference Include="NMemory">
-      <HintPath>..\packages\NMemory.1.0.1\lib\net45\NMemory.dll</HintPath>
+    <Reference Include="NMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <HintPath>..\packages\NMemory.1.1.2\lib\net45\NMemory.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\packages\Shouldly.2.5.0\lib\net40\Shouldly.dll</HintPath>

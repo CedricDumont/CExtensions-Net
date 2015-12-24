@@ -42,7 +42,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Effort.Next, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.Next.1.1.0-CI00022\lib\net45\Effort.Next.dll</HintPath>
+      <HintPath>..\packages\Effort.Next.1.1.0-CI00026\lib\net45\Effort.Next.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework">
@@ -53,8 +53,8 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="NMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NMemory.1.0.1\lib\net45\NMemory.dll</HintPath>
+      <HintPath>..\packages\NMemory.1.1.2\lib\net45\NMemory.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\packages\Shouldly.2.5.0\lib\net40\Shouldly.dll</HintPath>

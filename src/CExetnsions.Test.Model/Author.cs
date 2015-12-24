@@ -16,9 +16,13 @@ namespace CExtensions.Test.Model
         // Reverse navigation
         public virtual ICollection<Post> Posts { get; set; } // POST.FK_POST_AUTHOR
 
+        public virtual ICollection<Comment> Comments { get; set; } // POST.FK_COMMENT_AUTHOR
+
         public Author()
         {
             Posts = new List<Post>();
+
+            Comments = new List<Comment>();
         }
     }
 }

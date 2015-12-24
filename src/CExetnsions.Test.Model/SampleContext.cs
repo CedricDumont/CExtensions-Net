@@ -21,6 +21,8 @@ namespace CExtensions.Test.Model
         public IDbSet<Author> Authors { get; set; } // AUTHOR
         public IDbSet<Post> Posts { get; set; } // POST
 
+        public IDbSet<Comment> Comments { get; set; } // Comment
+
         static SampleContext()
         {
             Database.SetInitializer<SampleContext>(new CreateDatabaseIfNotExists<SampleContext>());
@@ -52,14 +54,15 @@ namespace CExtensions.Test.Model
 
             modelBuilder.Configurations.Add(new AuthorConfiguration());
             modelBuilder.Configurations.Add(new PostConfiguration());
+            modelBuilder.Configurations.Add(new CommentConfiguration());
         }
 
-        public static DbModelBuilder CreateModel(DbModelBuilder modelBuilder, string schema)
-        {
-            modelBuilder.Configurations.Add(new AuthorConfiguration(schema));
-            modelBuilder.Configurations.Add(new PostConfiguration(schema));
-            return modelBuilder;
-        }
+        //public static DbModelBuilder CreateModel(DbModelBuilder modelBuilder, string schema)
+        //{
+        //    modelBuilder.Configurations.Add(new AuthorConfiguration(schema));
+        //    modelBuilder.Configurations.Add(new PostConfiguration(schema));
+        //    return modelBuilder;
+        //}
 
     }
    
@@ -94,6 +97,22 @@ namespace CExtensions.Test.Model
 
             // Foreign keys
             HasRequired(a => a.Author).WithMany(b => b.Posts).HasForeignKey(c => c.AutId); // FK_POST_AUTHOR
+        }
+    }
+
+    internal class CommentConfiguration : EntityTypeConfiguration<Comment>
+    {
+        public CommentConfiguration(string schema = "dbo")
+        {
+            ToTable(schema + ".COMMENT");
+            HasKey(x => x.Id);
+
+            Property(x => x.Id).HasColumnName("Com_Id").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
+            Property(x => x.Body).HasColumnName("Com_Body").IsOptional();
+
+            HasOptional(x => x.Author).WithMany(x => x.Comments).HasForeignKey(x => x.AutId); // FK_POST_AUTHOR
+            HasRequired(x => x.Post).WithMany(x => x.Comments).HasForeignKey(x => x.PostId); // FK_POST_AUTHOR
+
         }
     }
 
