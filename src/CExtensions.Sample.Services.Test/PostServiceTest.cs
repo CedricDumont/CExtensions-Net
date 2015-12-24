@@ -69,9 +69,9 @@ namespace CExtensions.Sample.Services.Test
         }
 
        [Fact]
-        public void Test100()
+        public void BENCHMARK()
         {
-            int ITERATION_COUNT = 100;
+            int ITERATION_COUNT = 1;
          
 
             Stopwatch transientWatch = new Stopwatch();

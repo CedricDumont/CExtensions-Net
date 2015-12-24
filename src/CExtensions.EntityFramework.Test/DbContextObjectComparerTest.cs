@@ -71,7 +71,7 @@ namespace CExtensions.EntityFramework
             SampleContext ctx2 = xmlFileExpectedCtx.ExpectedContext("test4");
             SampleContext ctx3 = xmlFileExpectedCtx.ExpectedContext("test4b");
 
-            var auth = ctx1.Authors.Find((decimal)1);
+            var auth = ctx1.Authors.Find((Int64)1);
             auth.FirstName = "cedric";
             
             var result = await ctx1.CompareTo(ctx2);
