@@ -38,7 +38,7 @@ namespace CExtensions.EntityFramework.Test
             XmlComparisonResult result = null;
             XmlComparisonUtils xmlUtils = new XmlComparisonUtils();
 
-            using (SampleContext sampleContext = DbContextFactory.CreateFromPersistent<SampleContext>(connectionName, filepath))
+            using (SampleContext sampleContext = DbContextFactory<SampleContext>.Create(filepath, ConnectionBehaviour.Persistent, connectionName))
             {
                 using (DbContext originalTracker = OriginalDbContextTracker.Instance.AddTracker(sampleContext))
                 {
@@ -65,7 +65,7 @@ namespace CExtensions.EntityFramework.Test
             string xml_result_ori = null;
             string xml_result_actual = null;
 
-            using (SampleContext sampleContext = DbContextFactory.CreateFromPersistent<SampleContext>(connectionName, filepath))
+            using (SampleContext sampleContext = DbContextFactory< SampleContext>.Create(filepath, ConnectionBehaviour.Persistent, connectionName))
             {
                 using (DbContext originalTracker = OriginalDbContextTracker.Instance.AddTracker(sampleContext))
                 {

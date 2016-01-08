@@ -51,13 +51,6 @@ namespace CExtensions.Effort
             return Create(ContextEnum.Expected, testName, folderName, useTransient);
         }
 
-        //private T Create(ContextEnum direction, string testName, string folderName = "input", bool useTransient = true)
-        //{
-        //    string suffix = direction == ContextEnum.Expected ? "_out" : "_in";
-
-        //    return Create(testName + suffix, folderName, useTransient);
-
-        //}
 
         public static EffortConnection currentCOnnection = null;
         public static EffortConnection currentCOnnection_input = null;
