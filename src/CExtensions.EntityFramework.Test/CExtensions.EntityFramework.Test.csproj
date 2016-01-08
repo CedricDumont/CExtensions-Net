@@ -77,7 +77,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DBContextDumpExtensionsTest.cs" />
     <Compile Include="DBContextExtensionsTest.cs" />
     <Compile Include="DbContextObjectComparerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

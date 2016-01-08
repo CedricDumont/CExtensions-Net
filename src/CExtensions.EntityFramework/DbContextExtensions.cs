@@ -6,6 +6,7 @@ using System.Data.Entity.Core.EntityClient;
 using System.Data.Entity.Core.Mapping;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Core.Objects.DataClasses;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Reflection;
@@ -159,6 +160,26 @@ namespace CExtensions.EntityFramework
             return null;
         }
 
+        public static Object GetOriginalValue(this DbContext context, Object Entity, string proName)
+        {
+            var originalValues = context.AsObjectContext()
+                       .ObjectStateManager.GetObjectStateEntry(Entity).OriginalValues;
+
+            var value = originalValues[proName];
+
+            return value;
+
+            //if (Entity != null)
+            //{
+            //    PropertyInfo value = Entity.GetType().GetProperty(proName);
+
+            //}
+
+            //return null;
+           
+
+        }
+
 
 
         public static Object GetPrimitivePropertyValue(this Object item, string proName)
@@ -217,21 +238,23 @@ namespace CExtensions.EntityFramework
 
         }
 
-        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, string entityLoLoad = null, object objectEntityId = null, bool includeNull = true)
+        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, string entityLoLoad = null, object objectEntityId = null, bool includeNull = true, bool originalValues = false)
         {
             StringBuilder sb = new StringBuilder();
+
+            List<string> loadTracker = new List<string>();
 
             sb.Append("<" + rootName + ">");
 
             if (entityLoLoad.IsNotNullOrEmpty())
             {
-                await WriteDbSet(dbContext, contextData, sb, dbContext.Set(entityLoLoad), objectEntityId, includeNull: includeNull);
+                await WriteDbSet(dbContext, contextData, sb, dbContext.Set(entityLoLoad), objectEntityId, loadTracker: loadTracker, includeNull: includeNull);
             }
             else
             {
                 foreach (DbSet dbset in dbContext.DbSets())
                 {
-                    await WriteDbSet(dbContext, contextData, sb, dbset, null, includeNull:includeNull);
+                    await WriteDbSet(dbContext, contextData, sb, dbset, null, loadTracker:loadTracker, includeNull:includeNull);
                 }
             }
 
@@ -306,9 +329,11 @@ namespace CExtensions.EntityFramework
             #endregion
         }
 
-        private static Boolean CanWrite(this List<string> container, string key)
+        private static Boolean CanWrite(this List<string> container, string elemntType, Object id)
         {
-            if(container.Contains(key))
+            string key = elemntType + id;
+
+            if (container.Contains(key))
             {
                 return false;
             }
@@ -330,11 +355,37 @@ namespace CExtensions.EntityFramework
 
             if (objectId == null)
             {
-                var itemList = contextData == ContextDataEnum.Local ? dbset.Local : await dbset.ToListAsync();
+                var itemList = ((contextData == ContextDataEnum.Local) || (contextData == ContextDataEnum.Relations)) ? dbset.Local : await dbset.ToListAsync();
 
                 foreach (var item in itemList)
                 {
-                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, includeNull);
+                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
+                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
+
+                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, itemId, loadTracker, includeNull);
+
+                    IEnumerable<IRelatedEnd> relEnds =
+                    itemEntry.RelationshipManager
+                         .GetAllRelatedEnds();
+
+                    if (contextData == ContextDataEnum.Relations)
+                    {
+                        foreach (IRelatedEnd relEnd in relEnds)
+                        {
+                            
+                                relEnd.Load();
+                                foreach (var loadedItem in relEnd)
+                                {
+                                    var loadedItemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(loadedItem);
+                                    var loadedItemEntryId = loadedItemEntry.EntityKey.EntityKeyValues[0].Value;
+
+                                    WriteElement(sb, loadedItemEntry.Entity, dbContext, loadedItemEntry.EntitySet.ElementType.Name, loadedItemEntryId, loadTracker, includeNull);
+                                }
+                           
+                        }
+                    }
+
+
                 }
             }
             else
@@ -346,29 +397,30 @@ namespace CExtensions.EntityFramework
                     throw new Exception("could not find item of type : " + entityName + " with id  : " + objectId);
                 }
 
-                if (loadTracker.CanWrite(dbset.ElementType.Name + objectId))
+                WriteElement(sb, item, dbContext, dbset.ElementType.Name, objectId, loadTracker, includeNull);
+
+                await WriteItemCollections(dbContext, sb, loadTracker, item);
+
+            }
+
+        }
+
+        private static async Task WriteItemCollections(DbContext dbContext, StringBuilder sb, List<string> loadTracker, object item)
+        {
+            var collectionProps = from prop in item.GetType().GetProperties() where prop.IsACollectionType() select prop;
+
+            foreach (var prop in collectionProps)
+            {
+                //invoke on the item
+                IEnumerable linkedCollection = (IEnumerable)item.GetPropertyValue(prop.Name);
+
+                Type type = prop.PropertyType.GetGenericArguments()[0];
+
+                DbSet set = dbContext.Set(type.Name);
+
+                if (set != null)
                 {
-                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, includeNull);
-                }
-
-                if (true)
-                {
-                    var collectionProps = from prop in item.GetType().GetProperties() where prop.IsACollectionType() select prop;
-
-                    foreach (var prop in collectionProps)
-                    {
-                        //invoke on the item
-                        IEnumerable linkedCollection = (IEnumerable)item.GetPropertyValue(prop.Name);
-
-                        Type type = prop.PropertyType.GetGenericArguments()[0];
-
-                        DbSet set = dbContext.Set(type.Name);
-
-                        if (set != null)
-                        {
-                            await WriteCollection(sb, linkedCollection, dbContext, type.Name, loadTracker);
-                        }
-                    }
+                    await WriteCollection(sb, linkedCollection, dbContext, type.Name, loadTracker);
                 }
             }
         }
@@ -408,6 +460,7 @@ namespace CExtensions.EntityFramework
 
             return colName;
         }
+
 
         public static String MappedPropertyName(this DbContext dbContext, string tableName, string columnName)
         {
@@ -455,9 +508,16 @@ namespace CExtensions.EntityFramework
 
         }
 
-        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Boolean includeNull)
+        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Object elementId, List<string> loadTracker, Boolean includeNull)
+//        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Boolean includeNull)
         {
+           
             if(item == null)
+            {
+                return;
+            }
+
+            if (!loadTracker.CanWrite(elementName, elementId))
             {
                 return;
             }

@@ -1,0 +1,51 @@
+﻿<Root>
+  <AUTHOR>
+    <AUT_ID>1</AUT_ID>
+    <AUT_FIRSTNAME>Dark</AUT_FIRSTNAME>
+    <AUT_LASTNAME>Vador</AUT_LASTNAME>
+    <AUT_EXPERIENCE>999</AUT_EXPERIENCE>
+  </AUTHOR>
+  <AUTHOR>
+    <AUT_ID>2</AUT_ID>
+    <AUT_FIRSTNAME>Luke</AUT_FIRSTNAME>
+    <AUT_LASTNAME>Skywalker</AUT_LASTNAME>
+    <AUT_EXPERIENCE>150</AUT_EXPERIENCE>
+  </AUTHOR>
+  <POST>
+    <Post_Id>1</Post_Id>
+    <Subject>Advice</Subject>
+    <Body>May the dark side of the force be with you</Body>
+    <AUT_ID>1</AUT_ID>
+  </POST>
+  <POST>
+    <Post_Id>2</Post_Id>
+    <Subject>my advice</Subject>
+    <Body>May the force be with you</Body>
+    <DateCreated>4/05/2015 00:00:00</DateCreated>
+    <AUT_ID>2</AUT_ID>
+  </POST>
+  <POST>
+    <Post_Id>3</Post_Id>
+    <Subject>Another Advice</Subject>
+    <Body>Be lucky</Body>
+    <DateCreated>6/04/2015 00:00:00</DateCreated>
+    <AUT_ID>2</AUT_ID>
+  </POST>
+  <COMMENT>
+    <Com_Id>1</Com_Id>
+    <Com_Body>You arer so bad</Com_Body>
+    <POST_ID>1</POST_ID>
+    <AUT_ID>2</AUT_ID>
+  </COMMENT>
+  <COMMENT>
+    <Com_Id>2</Com_Id>
+    <Com_Body>You are my son luke</Com_Body>
+    <POST_ID>1</POST_ID>
+    <AUT_ID>1</AUT_ID>
+  </COMMENT>
+  <COMMENT>
+    <Com_Id>3</Com_Id>
+    <Com_Body>anonymous comment from yoda</Com_Body>
+    <POST_ID>1</POST_ID>
+  </COMMENT>
+</Root>

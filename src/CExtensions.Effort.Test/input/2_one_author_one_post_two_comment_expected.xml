@@ -1,0 +1,26 @@
+﻿<Root>
+  <AUTHOR>
+    <AUT_ID>2</AUT_ID>
+    <AUT_FIRSTNAME>OriginalFIRSTNAME</AUT_FIRSTNAME>
+    <AUT_LASTNAME>OriginalLASTNAME</AUT_LASTNAME>
+    <AUT_EXPERIENCE>999</AUT_EXPERIENCE>
+  </AUTHOR>
+  <POST>
+    <Post_Id>3</Post_Id>
+    <Subject>OriginalSubject</Subject>
+    <Body>Original_BODY</Body>
+    <AUT_ID>2</AUT_ID>
+  </POST>
+  <COMMENT>
+    <Com_Id>1</Com_Id>
+    <Com_Body>You arer so bad</Com_Body>
+    <POST_ID>3</POST_ID>
+    <AUT_ID>2</AUT_ID>
+  </COMMENT>
+  <COMMENT>
+    <Com_Id>2</Com_Id>
+    <Com_Body>You are my son luke</Com_Body>
+    <POST_ID>3</POST_ID>
+    <AUT_ID>2</AUT_ID>
+  </COMMENT>
+</Root>

@@ -109,6 +109,8 @@ namespace CExtensions.Test.Model
 
             Property(x => x.Id).HasColumnName("Com_Id").IsRequired().HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
             Property(x => x.Body).HasColumnName("Com_Body").IsOptional();
+            Property(x => x.AutId).HasColumnName("AUT_ID").IsOptional();
+            Property(x => x.PostId).HasColumnName("POST_ID").IsRequired();
 
             HasOptional(x => x.Author).WithMany(x => x.Comments).HasForeignKey(x => x.AutId); // FK_POST_AUTHOR
             HasRequired(x => x.Post).WithMany(x => x.Comments).HasForeignKey(x => x.PostId); // FK_POST_AUTHOR
