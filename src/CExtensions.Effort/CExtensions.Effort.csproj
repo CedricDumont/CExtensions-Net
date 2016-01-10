@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Effort.Next, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Effort.Next.1.1.0-CI00030\lib\net45\Effort.Next.dll</HintPath>
+      <HintPath>..\packages\Effort.Next.1.1.0\lib\net45\Effort.Next.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
