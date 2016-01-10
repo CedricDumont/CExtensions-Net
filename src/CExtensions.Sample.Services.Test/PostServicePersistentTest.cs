@@ -13,8 +13,10 @@ namespace CExtensions.Sample.Services.Test
     {
 
         [Theory(DisplayName = "Creating Post Using persistent configuration")]
-        [InlineData("test1", 1, "sampleSubject", "sampleBody")]
-        [InlineData("test2", 2, "sampleSubject2", "sampleBody2")]
+        [InlineData("test01", 1, "sampleSubject", "sampleBody")]
+        [InlineData("test02", 2, "sampleSubject2", "sampleBody2")]
+        [InlineData("test03", 2, "sampleSubject2", "sampleBody2")]
+        [InlineData("test04", 2, "sampleSubject2", "sampleBody2")]
         public async Task Should_CreateNewPost(string test, Int64 actorId, string postsubject, string postBody)
         {
             using (SampleContext ctx = GetInputContext(test))

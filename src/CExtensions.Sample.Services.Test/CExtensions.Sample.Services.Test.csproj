@@ -119,6 +119,18 @@
     <Content Include="input\test2_out.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="persistent_tests_input\test04_in.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="persistent_tests_input\test03_in.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="persistent_tests_input\test04_out.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="persistent_tests_input\test03_out.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="persistent_tests_input\test42_in.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -155,16 +167,16 @@
     <Content Include="persistent_tests_input\test20_out.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="persistent_tests_input\test1_in.xml">
+    <Content Include="persistent_tests_input\test01_in.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="persistent_tests_input\test1_out.xml">
+    <Content Include="persistent_tests_input\test01_out.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="persistent_tests_input\test2_in.xml">
+    <Content Include="persistent_tests_input\test02_in.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="persistent_tests_input\test2_out.xml">
+    <Content Include="persistent_tests_input\test02_out.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

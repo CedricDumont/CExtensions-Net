@@ -11,16 +11,4 @@
     <AUT_LASTNAME>On The Roof</AUT_LASTNAME>
     <AUT_EXPERIENCE>1</AUT_EXPERIENCE>
   </AUTHOR>
-  <POST>
-    <Post_Id>1</Post_Id>
-    <Subject>First Text</Subject>
-    <Body>Some Text here</Body>
-    <AUT_ID>1</AUT_ID>
-  </POST>
-  <POST>
-    <Post_Id>2</Post_Id>
-    <Subject>sampleSubject</Subject>
-    <Body>sampleBody</Body>
-    <AUT_ID>1</AUT_ID>
-  </POST>
 </Root>
