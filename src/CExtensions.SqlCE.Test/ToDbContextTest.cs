@@ -11,7 +11,7 @@ namespace CExtensions.SqlCE.Test
 {
     public class ToDbContextTest
     {
-        [Fact]
+       // [Fact]
         public void TestMethod1()
         {
             string _rootPath = this.GetType().AssemblyDirectory() + "\\input\\test1_in.xml";

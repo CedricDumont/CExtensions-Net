@@ -68,27 +68,33 @@ namespace CExtensions.Sample.Services.Test
             }
         }
 
-       //[Fact]
+       [Fact]
         public void BENCHMARK()
         {
             int ITERATION_COUNT = 1;
-         
 
             Stopwatch transientWatch = new Stopwatch();
-            Stopwatch doWorkTransient = new Stopwatch();
-            Stopwatch doWorkNonTransient = new Stopwatch();
-            Stopwatch doWorkSqlCe = new Stopwatch();
+            Stopwatch doWorkTransientWatch = new Stopwatch();
+            Stopwatch doWorkNonTransientWatch = new Stopwatch();
+            Stopwatch doWorkSqlCeWatch = new Stopwatch();
+
+            //
+            // Benchmark for transient connection
+            //
             useTransient = true;
             transientWatch.Start();
             for (int i = 0; i < ITERATION_COUNT; i++)
             {
                 SampleContext inputContext = GetInputContext("test2");
                 SampleContext outputContext = GetExpectedContext("test2");
-                var task = DoWork(inputContext, outputContext, doWorkTransient);
+                var task = DoWork(inputContext, outputContext, doWorkTransientWatch);
                 task.Wait();
             }
             transientWatch.Stop();
 
+            //
+            // Benchmark for SqlCe
+            //
             string test_in = this.GetType().AssemblyDirectory() + "\\input\\test2_in.xml";
             string test_out = this.GetType().AssemblyDirectory() + "\\input\\test2_out.xml";
 
@@ -99,13 +105,15 @@ namespace CExtensions.Sample.Services.Test
             {
                 SampleContext inputContext = test_in.ToDbContext<SampleContext>("in");
                 SampleContext outputContext = test_out.ToDbContext<SampleContext>("out");
-                var task = DoWork(inputContext, outputContext, doWorkSqlCe);
+                var task = DoWork(inputContext, outputContext, doWorkSqlCeWatch);
                 task.Wait();
             }
             sqlCeWatch.Stop();
             SqlCEExtensions.StopAllWatch();
 
-            XmlFileContext<SampleContext>.currentCOnnection = null;
+            //
+            // Benchmark for persistent connection 
+            //
             useTransient = false;
             Stopwatch nontransientWatch = new Stopwatch();
             nontransientWatch.Start();
@@ -113,26 +121,33 @@ namespace CExtensions.Sample.Services.Test
             {
                 SampleContext inputContext = GetInputContext("test2");
                 SampleContext outputContext = GetExpectedContext("test2");
-                var task = DoWork(inputContext, outputContext, doWorkNonTransient);
+                var task = DoWork(inputContext, outputContext, doWorkNonTransientWatch);
                 task.Wait();
             }
             nontransientWatch.Stop();
 
-
+            Debug.WriteLine("SQLCE BENCMARK");
+            Debug.WriteLine("---------------");
             Debug.WriteLine("total inner time = " + SqlCEExtensions.overAllWatch.ElapsedMilliseconds);
             Debug.WriteLine("insert time = " + SqlCEExtensions.insertWatch.ElapsedMilliseconds);
             Debug.WriteLine("delete time = " + SqlCEExtensions.deleteWatch.ElapsedMilliseconds);
             Debug.WriteLine("ds time = " + SqlCEExtensions.dsWathc.ElapsedMilliseconds);
             Debug.WriteLine("activator time = " + SqlCEExtensions.ActivatorWatch.ElapsedMilliseconds);
             Debug.WriteLine("createDb time = " + SqlCEExtensions.DbCreationWatch.ElapsedMilliseconds);
-
-            Debug.WriteLine("totalTime sqlce dowork = " + doWorkSqlCe.ElapsedMilliseconds);
-            Debug.WriteLine("totalTime transient dowork = " + doWorkTransient.ElapsedMilliseconds);
-            Debug.WriteLine("totalTime non transient  dowork= " + doWorkNonTransient.ElapsedMilliseconds);
-
+            Debug.WriteLine("totalTime sqlce dowork = " + doWorkSqlCeWatch.ElapsedMilliseconds);
             Debug.WriteLine("totalTime sqlce time = " + sqlCeWatch.ElapsedMilliseconds);
+
+            Debug.WriteLine("");
+            Debug.WriteLine("TRANSIENT BENCMARK");
+            Debug.WriteLine("------------------");
+            Debug.WriteLine("totalTime transient dowork = " + doWorkTransientWatch.ElapsedMilliseconds);
             Debug.WriteLine("totalTime transient = " + transientWatch.ElapsedMilliseconds);
-            Debug.WriteLine("totalTime non transient = " + nontransientWatch.ElapsedMilliseconds);
+
+            Debug.WriteLine("");
+            Debug.WriteLine("PERSISTENT BENCMARK");
+            Debug.WriteLine("--------------------");
+            Debug.WriteLine("totalTime persistent  dowork= " + doWorkNonTransientWatch.ElapsedMilliseconds);
+            Debug.WriteLine("totalTime persistent transient = " + nontransientWatch.ElapsedMilliseconds);
         }
 
         private static async Task DoWork(SampleContext inputContext, SampleContext outputContext, Stopwatch doworkWatch)

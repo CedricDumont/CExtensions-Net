@@ -52,77 +52,108 @@ namespace CExtensions.Effort
         }
 
 
-        public static EffortConnection currentCOnnection = null;
-        public static EffortConnection currentCOnnection_input = null;
-        public static EffortConnection currentCOnnection_output = null;
-        static T instance;
-
-        public T Create(ContextEnum direction = ContextEnum.Input, string testName = null, string folderName = "input", bool useTransient = true)
+        public T Create(
+            ContextEnum direction = ContextEnum.Input, 
+            string testName = null, 
+            string folderName = "input", 
+            bool useTransient = true)
         {
+
             string suffix = direction == ContextEnum.Expected ? "_out" : "_in";
 
             string testFileName = testName + suffix;
 
-            IDataLoader loader;
+            T context = null;
+
+            string testFullFileName = null;
+
 
             if (testFileName != null)
             {
-                string testFullFileName = _rootPath + "\\" + folderName + "\\" + testFileName + ".xml";
-
-                //Debug.Write("FULL file Name : " + testFullFileName);
-
-                loader = new CachingDataLoader(new XmlDataLoader(testFullFileName));
-            }
-            else
-            {
-                loader = new CsvDataLoader();
+                testFullFileName = _rootPath + "\\" + folderName + "\\" + testFileName + ".xml";
             }
 
             if (useTransient)
             {
-                currentCOnnection = (EffortConnection)DbConnectionFactory.CreateTransient(loader);
-                instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection);
+                context = DbContextFactory<T>.Create(testFullFileName);
+
             }
             else
             {
-                if (direction == ContextEnum.Input)
-                {
-                    if (currentCOnnection_input == null)
-                    {
-                        currentCOnnection_input = (EffortConnection)DbConnectionFactory.CreatePersistent(direction.ToString(), loader);
-                    }
-                    else
-                    {
-                        currentCOnnection_input.LoadData(loader);
-                    }
-                    instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection_input);
-                }
-                else
-                {
-                    if (currentCOnnection_output == null)
-                    {
-                        currentCOnnection_output = (EffortConnection)DbConnectionFactory.CreatePersistent(direction.ToString(), loader);
-                    }
-                    else
-                    {
-                        currentCOnnection_output.LoadData(loader);
-                    }
-                    instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection_output);
-                }
+                string connName = typeof(T).FullName + suffix;
+
+                context = DbContextFactory<T>.Create(testFullFileName, ConnectionBehaviour.Persistent, connName);
+
             }
 
-           
-
-            if (testFileName != null)
-            {
-                instance.Database.CreateIfNotExists();
-            }
-
-            //_effortDBManager = currentCOnnection.DbManager;
-
-            return instance;
+            return context;
         }
 
+        //public T Create(ContextEnum direction = ContextEnum.Input, string testName = null, string folderName = "input", bool useTransient = true)
+        //{
+        //    string suffix = direction == ContextEnum.Expected ? "_out" : "_in";
+
+        //    string testFileName = testName + suffix;
+
+        //    IDataLoader loader;
+
+        //    if (testFileName != null)
+        //    {
+        //        string testFullFileName = _rootPath + "\\" + folderName + "\\" + testFileName + ".xml";
+
+        //        //Debug.Write("FULL file Name : " + testFullFileName);
+
+        //        loader = new CachingDataLoader(new XmlDataLoader(testFullFileName));
+        //    }
+        //    else
+        //    {
+        //        loader = new CsvDataLoader();
+        //    }
+
+        //    if (useTransient)
+        //    {
+        //        currentCOnnection = (EffortConnection)DbConnectionFactory.CreateTransient(loader);
+        //        instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection);
+        //    }
+        //    else
+        //    {
+        //        if (direction == ContextEnum.Input)
+        //        {
+        //            if (currentCOnnection_input == null)
+        //            {
+        //                currentCOnnection_input = (EffortConnection)DbConnectionFactory.CreatePersistent(direction.ToString(), loader);
+        //            }
+        //            else
+        //            {
+        //                currentCOnnection_input.LoadData(loader);
+        //            }
+        //            instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection_input);
+        //        }
+        //        else
+        //        {
+        //            if (currentCOnnection_output == null)
+        //            {
+        //                currentCOnnection_output = (EffortConnection)DbConnectionFactory.CreatePersistent(direction.ToString(), loader);
+        //            }
+        //            else
+        //            {
+        //                currentCOnnection_output.LoadData(loader);
+        //            }
+        //            instance = (T)Activator.CreateInstance(typeof(T), currentCOnnection_output);
+        //        }
+        //    }
+
+
+
+        //    if (testFileName != null)
+        //    {
+        //        instance.Database.CreateIfNotExists();
+        //    }
+
+        //    //_effortDBManager = currentCOnnection.DbManager;
+
+        //    return instance;
+        //}
 
 
         public T Empty()
