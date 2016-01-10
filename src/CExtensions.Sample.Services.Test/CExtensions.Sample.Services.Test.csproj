@@ -57,10 +57,6 @@
     <Reference Include="KellermanSoftware.Compare-NET-Objects">
       <HintPath>..\packages\CompareNETObjects.3.02.0.0\lib\net45\KellermanSoftware.Compare-NET-Objects.dll</HintPath>
     </Reference>
-    <Reference Include="NMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
-      <HintPath>..\packages\NMemory.1.1.2\lib\net45\NMemory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="NMemory.Next, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NMemory.Next.1.0.2\lib\net45\NMemory.Next.dll</HintPath>
       <Private>True</Private>

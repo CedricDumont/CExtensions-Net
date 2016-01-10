@@ -60,10 +60,6 @@
       <HintPath>..\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
-      <HintPath>..\packages\NMemory.1.1.2\lib\net45\NMemory.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="NMemory.Next, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NMemory.Next.1.0.2\lib\net45\NMemory.Next.dll</HintPath>
       <Private>True</Private>
