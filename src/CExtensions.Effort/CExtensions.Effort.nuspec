@@ -11,9 +11,10 @@
     <description>Effort Extensions and Helpers for all Cextensions projects in .net</description>
     <summary>Effort Extensions and Helpers for all Cextensions projects in .net</summary>
     <copyright>Copyright 2015</copyright>
-    <tags>.NET Extensions</tags> </metadata>
+    <tags>.NET Extensions</tags>
     <dependencies>
       <dependency id="CExtensions.EntityFramework" version="1.1.0"/>
     </dependencies>
+  </metadata>
   <files />
 </package>
