@@ -45,6 +45,23 @@ namespace CExtensions.Sample.Services
             myContext.SaveChanges();
         }
 
+        public void DeleteAuthor(Int64 authorId)
+        {
+            var author = myContext.Authors.Find(authorId);
+
+            if (author == null)
+            {
+                throw new Exception("Author was not found");
+            }
+            if(author.Posts.Count > 0)
+            {
+                throw new Exception("Delete all Post first");
+            }
+
+            myContext.Authors.Remove(author);
+            myContext.SaveChanges();
+        }
+
         public void CreateNewPost(Int64 autid, String postSubject, String postBody)
         {
             var post = myContext.Posts.Create<Post>();

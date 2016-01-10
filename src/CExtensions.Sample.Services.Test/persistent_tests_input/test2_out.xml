@@ -1,0 +1,26 @@
+﻿<Root>
+  <AUTHOR>
+    <AUT_ID>1</AUT_ID>
+    <AUT_FIRSTNAME>John</AUT_FIRSTNAME>
+    <AUT_LASTNAME>Doe</AUT_LASTNAME>
+    <AUT_EXPERIENCE>12</AUT_EXPERIENCE>
+  </AUTHOR>
+  <AUTHOR>
+    <AUT_ID>2</AUT_ID>
+    <AUT_FIRSTNAME>Alice</AUT_FIRSTNAME>
+    <AUT_LASTNAME>On The Roof</AUT_LASTNAME>
+    <AUT_EXPERIENCE>1</AUT_EXPERIENCE>
+  </AUTHOR>
+  <POST>
+    <Post_Id>2</Post_Id>
+    <Subject>First Text</Subject>
+    <Body>Some Text here</Body>
+    <AUT_ID>1</AUT_ID>
+  </POST>
+  <POST>
+    <Post_Id>3</Post_Id>
+    <Subject>sampleSubject2</Subject>
+    <Body>sampleBody2</Body>
+    <AUT_ID>2</AUT_ID>
+  </POST>
+</Root>
