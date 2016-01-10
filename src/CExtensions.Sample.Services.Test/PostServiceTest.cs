@@ -68,7 +68,7 @@ namespace CExtensions.Sample.Services.Test
             }
         }
 
-       [Fact]
+       //[Fact]
         public void BENCHMARK()
         {
             int ITERATION_COUNT = 1;
