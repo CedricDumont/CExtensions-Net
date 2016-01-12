@@ -20,5 +20,25 @@ namespace Test.Helper
 
             return filePath;
         }
+
+        public string GetOutFileContent(string testName, string forlderName = "input")
+        {
+            string filePath = GetFilePath(testName + "_out.xml", forlderName);
+
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        public string GetInFileContent(string testName, string forlderName = "input")
+        {
+            string filePath = GetFilePath(testName + "_in.xml", forlderName);
+
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                return reader.ReadToEnd();
+            }
+        }
     }
 }

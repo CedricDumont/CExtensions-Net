@@ -1,0 +1,20 @@
+﻿<Root>
+  <AUTHOR>
+    <AUT_ID>2</AUT_ID>
+    <AUT_FIRSTNAME>Luke</AUT_FIRSTNAME>
+    <AUT_LASTNAME>Skywalker</AUT_LASTNAME>
+    <AUT_EXPERIENCE>150</AUT_EXPERIENCE>
+  </AUTHOR>
+  <POST>
+    <Post_Id>2</Post_Id>
+    <Subject>my advice</Subject>
+    <Body>May the force be with you</Body>
+    <AUT_ID>2</AUT_ID>
+  </POST>
+  <COMMENT>
+    <Com_Id>2</Com_Id>
+    <Com_Body>You are my son luke</Com_Body>
+    <POST_ID>2</POST_ID>
+    <AUT_ID>1</AUT_ID>
+  </COMMENT>
+</Root>

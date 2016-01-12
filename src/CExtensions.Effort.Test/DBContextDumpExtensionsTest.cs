@@ -78,7 +78,6 @@ namespace CExtensions.EntityFramework.Test
                 result.Differences.Count.ShouldBe(1);
                 result.Differences[0].ToString().ShouldBe("Post.Body Should be [Original Body] but was [Changed : Original Body] - object with Post_Id : 1");
 
-
                 sampleContext.StopRecordingOriginalValues();
 
             }

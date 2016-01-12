@@ -90,6 +90,7 @@ namespace CExtensions.Sample.Services.Test
                 var task = DoWork(inputContext, outputContext, doWorkTransientWatch);
                 task.Wait();
             }
+
             transientWatch.Stop();
 
             //

@@ -105,6 +105,26 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="as-xml-tests\test_1All2_out.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="as-xml-tests\test_1Relations2_out.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="as-xml-tests\test_1Local2_out.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="as-xml-tests\test_1Relations1_out.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="as-xml-tests\test_1_in.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="input\1_one_author.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -158,6 +178,10 @@
     <ProjectReference Include="..\CExtensions.Xml\CExtensions.Xml.csproj">
       <Project>{dc38d433-3b8d-4672-87a4-e37a1f699fe8}</Project>
       <Name>CExtensions.Xml</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Test.Helper\Test.Helper.csproj">
+      <Project>{e482f0df-10a7-4307-a5ad-eb7700786ffa}</Project>
+      <Name>Test.Helper</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
