@@ -39,7 +39,12 @@ namespace CExtensions.Test.Model
         }
 
         public SampleContext(DbConnection existingConn)
-            : base(existingConn, true)
+           : base(existingConn, true)
+        {
+        }
+
+        public SampleContext(DbConnection existingConn, bool ownsConnection)
+            : base(existingConn, ownsConnection)
         {
         }
 

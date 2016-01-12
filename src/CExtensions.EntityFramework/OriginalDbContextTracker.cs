@@ -1,69 +1,173 @@
-﻿using System;
+﻿using Castle.DynamicProxy;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace CExtensions.EntityFramework
 {
-    public class OriginalDbContextTracker : IDisposable
+    public class OriginalDbContextTracker<T> : IDisposable where T : DbContext
     {
-        private IDictionary<Guid, DbContext> _dbContextCollection;
+        private IDictionary<Guid, Tuple<T, InternalMaterializerDelegateTracker<T>>> _OriginalValuesDbContextCollection;
 
-        public static OriginalDbContextTracker Instance = new OriginalDbContextTracker();
+        private IDictionary<Guid, T> _TrackedDbContextCollection;
+
+        public static OriginalDbContextTracker<T> Instance = new OriginalDbContextTracker<T>();
 
         private OriginalDbContextTracker()
         {
-            _dbContextCollection = new Dictionary<Guid, DbContext>();
+            _OriginalValuesDbContextCollection = new Dictionary<Guid, Tuple<T, InternalMaterializerDelegateTracker<T>>>();
+            _TrackedDbContextCollection = new Dictionary<Guid, T>();
         }
 
-        public DbContext AddTracker(DbContext toBeTracked)
+        public T AddTracker(T trackedContext)
         {
-            // create an new DbContext
-            DbContext tracker = new DbContext(toBeTracked.AsObjectContext().Connection, false);
+            var constructor = typeof(T).GetConstructor(new Type[] { typeof(DbConnection), typeof(bool) });
 
+            if (constructor == null)
+            {
+                throw new ArgumentException($"{typeof(T)} Should contain a constructor with a {typeof(DbConnection)} and {typeof(bool)}");
+            }
+            
+            T originalValuesContext = (T)constructor.Invoke(new Object[] { trackedContext.AsObjectContext().Connection, false });
+
+           // T originalValuesContext = (T)new ProxyGenerator().CreateClassProxy(typeof(T), new Object[] { trackedContext.AsObjectContext().Connection, false }, new DbContextInterceptor() { Name = "original" });
+
+          
             //Just to retrieve it later on
             Guid newGuid = Guid.NewGuid();
 
             //create the tracker delegate
-            var delegateTracker = new InternalMaterializerDelegateTracker(newGuid);
-            toBeTracked.AsObjectContext().ObjectMaterialized += delegateTracker.OriginalDbContextTracker_ObjectMaterialized;
+            var delegateTracker = new InternalMaterializerDelegateTracker<T>(originalValuesContext);
+            trackedContext.AsObjectContext().ObjectMaterialized += delegateTracker.OriginalDbContextTracker_ObjectMaterialized;
 
-            _dbContextCollection.Add(newGuid, tracker);
+            _OriginalValuesDbContextCollection.Add(newGuid, Tuple.Create(originalValuesContext, delegateTracker));
+            _TrackedDbContextCollection.Add(newGuid, trackedContext);
 
-            return tracker;
+            return trackedContext;
         }
 
-        public DbContext this[Guid guid]
+
+        public void PauseTracking(T trackedContext)
+        {
+            var guid = GetGuidFromTrackedDbContext(trackedContext);
+
+           // DbContext tracker = this[trackedContext];
+
+            var materializer = _OriginalValuesDbContextCollection[guid].Item2;
+
+            trackedContext.AsObjectContext().ObjectMaterialized -= materializer.OriginalDbContextTracker_ObjectMaterialized;
+            
+        }
+
+        public void ContinueTracking(T trackedContext)
+        {
+            var guid = GetGuidFromTrackedDbContext(trackedContext);
+
+           // DbContext tracker = this[trackedContext];
+
+            var materializer = _OriginalValuesDbContextCollection[guid].Item2;
+
+            trackedContext.AsObjectContext().ObjectMaterialized += materializer.OriginalDbContextTracker_ObjectMaterialized;
+
+        }
+
+        public void StopTracking(T trackedContext)
+        {
+            var guid = GetGuidFromTrackedDbContext(trackedContext);
+
+            DbContext tracker = this[trackedContext];
+
+            tracker.DisposeIfNotNull();
+
+            _OriginalValuesDbContextCollection.Remove(guid);
+            _TrackedDbContextCollection.Remove(guid);
+
+        }
+
+        public T this[Guid guid]
         {
             get
             {
-               return _dbContextCollection[guid];
+                return _OriginalValuesDbContextCollection[guid].Item1;
+            }
+
+        }
+
+        private Guid GetGuidFromTrackedDbContext(T trackedContext)
+        {
+            Guid guid = (from keypair in _TrackedDbContextCollection where keypair.Value == trackedContext select keypair.Key).FirstOrDefault();
+
+            return guid;
+        }
+
+        public T this[T trackedContext]
+        {
+            get
+            {
+                var guid = GetGuidFromTrackedDbContext(trackedContext);
+
+                return _OriginalValuesDbContextCollection[guid].Item1;
             }
 
         }
 
         public void Dispose()
         {
-            foreach (var item in _dbContextCollection.Values)
+            foreach (var item in _OriginalValuesDbContextCollection.Values)
             {
-                item.DisposeIfNotNull();
+                item.Item1.DisposeIfNotNull();
             }
 
-            _dbContextCollection.Clear();
+            _OriginalValuesDbContextCollection.Clear();
+            _TrackedDbContextCollection.Clear();
         }
     }
 
-    internal class InternalMaterializerDelegateTracker
+    public class DisposeMethodInterceptorHook : IProxyGenerationHook
     {
-        public InternalMaterializerDelegateTracker(Guid guid)
+        public void MethodsInspected()
         {
-            Guid = guid;
+            Console.WriteLine("inspected");
+            //throw new NotImplementedException();
         }
 
-        public  Guid Guid {  get; private set; }
+        public void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
+        {
+            Console.WriteLine("NonProxyableMemberNotification");
+            //throw new NotImplementedException();
+        }
+
+        public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
+        {
+            return true;
+        }
+    }
+
+    public class DbContextInterceptor : IInterceptor
+    {
+        public String Name { get; set; }
+
+        public void Intercept(IInvocation invocation)
+        {
+            Console.Write(Name);
+            invocation.Proceed();
+        }
+    }
+
+    internal class InternalMaterializerDelegateTracker<T> where T : DbContext
+    {
+        public InternalMaterializerDelegateTracker(T originalValuesContext)
+        {
+            OriginalValuesContext = originalValuesContext;
+        }
+
+        public T OriginalValuesContext { get; private set; }
 
 
         public void OriginalDbContextTracker_ObjectMaterialized(object sender, System.Data.Entity.Core.Objects.ObjectMaterializedEventArgs e)
@@ -71,7 +175,7 @@ namespace CExtensions.EntityFramework
             try
             {
                 //retrieve the tracker with the Guid
-                DbContext tempContext = OriginalDbContextTracker.Instance[Guid];
+                DbContext tempContext = OriginalValuesContext;
 
                 var clrType = ObjectContext.GetObjectType(e.Entity.GetType());
                 DbSet dbset = tempContext.Set(clrType);

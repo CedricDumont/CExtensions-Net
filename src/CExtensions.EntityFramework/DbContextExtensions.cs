@@ -19,10 +19,36 @@ namespace CExtensions.EntityFramework
     public static class DbContextExtensions
     {
 
+        #region Original Values Extensions
+
+        public static T StartRecordingOriginalValues<T>(this T dbContext) where T : DbContext
+        {
+            return OriginalDbContextTracker<T>.Instance.AddTracker(dbContext);
+        }
+
+        public static T GetRecordedContext<T>(this T dbContext) where T : DbContext
+        {
+            return (T) OriginalDbContextTracker<T>.Instance[dbContext];
+        }
+
+        public static void StopRecordingOriginalValues<T>(this T dbContext) where T : DbContext
+        {
+            OriginalDbContextTracker<T>.Instance.StopTracking(dbContext);
+        }
+
+        public static void PauseRecordingOriginalValues<T>(this T dbContext) where T : DbContext
+        {
+            OriginalDbContextTracker<T>.Instance.PauseTracking(dbContext);
+        }
+
+        #endregion
+
         public static ObjectContext AsObjectContext(this DbContext dbContext)
         {
             return ((IObjectContextAdapter)dbContext).ObjectContext;
         }
+
+       
 
         public static MetadataWorkspace MetadataWorkspace(this DbContext dbContext)
         {

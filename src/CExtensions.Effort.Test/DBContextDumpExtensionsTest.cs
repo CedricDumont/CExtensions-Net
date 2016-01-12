@@ -31,8 +31,8 @@ namespace CExtensions.EntityFramework.Test
         [InlineData("2_one_author_one_post_two_comment.xml", ContextDataEnum.All, 2)]
         public async Task OriginalShouldBeSameAsInput(string fileName, ContextDataEnum contextData, decimal autId)
         {
-            string filepath = this.GetType().AssemblyDirectory() + "\\input\\"+ fileName;
-            
+            string filepath = this.GetType().AssemblyDirectory() + "\\input\\" + fileName;
+
             string xml_result_ori = null;
             string xml_result_actual = null;
             XmlComparisonResult result = null;
@@ -40,50 +40,46 @@ namespace CExtensions.EntityFramework.Test
 
             using (SampleContext sampleContext = DbContextFactory<SampleContext>.Create(filepath, ConnectionBehaviour.Persistent, connectionName))
             {
-                using (DbContext originalTracker = OriginalDbContextTracker.Instance.AddTracker(sampleContext))
-                {
-                    //just load the author
-                    var autor = sampleContext.Authors.FirstOrDefault(aut => aut.Id == autId);
-                    autor.ShouldNotBe(null, $"author with id {autId} test {fileName}" );
+                sampleContext.StartRecordingOriginalValues();
 
-                    xml_result_actual = await sampleContext.AsXmlAsync(contextData);
-                    xml_result_ori = await originalTracker.AsXmlAsync(contextData);
+                //just load the author
+                var autor = sampleContext.Authors.FirstOrDefault(aut => aut.Id == autId);
+                autor.ShouldNotBe(null, $"author with id {autId} test {fileName}");
 
-                    result = xmlUtils.CompareXml(xml_result_actual, xml_result_ori);
-                    result.AreEqual.ShouldBe(true, result.ToString());
+                xml_result_actual = await sampleContext.AsXmlAsync(contextData);
+                xml_result_ori = await sampleContext.GetRecordedContext().AsXmlAsync(contextData);
 
-                }
+                result = xmlUtils.CompareXml(xml_result_actual, xml_result_ori);
+                result.AreEqual.ShouldBe(true, result.ToString());
 
+                sampleContext.StopRecordingOriginalValues();
             }
-       }
+        }
 
-        public async Task OriginalShouldBeSameAsInputTEMOP(string fileName)
+        [Theory(DisplayName = "ShouldRecordOriginalValues")]
+        [InlineData("test1")]
+        public async Task ShouldRecordOriginalValues(string test)
         {
+            var contextFactory = new XmlFileContext<SampleContext>(this.GetType());
 
-            string filepath = this.GetType().AssemblyDirectory() + "\\input\\" + fileName;
-
-            string xml_result_ori = null;
-            string xml_result_actual = null;
-
-            using (SampleContext sampleContext = DbContextFactory< SampleContext>.Create(filepath, ConnectionBehaviour.Persistent, connectionName))
+            using (SampleContext sampleContext = contextFactory.InputContext(test, "original-values-tests", false).StartRecordingOriginalValues())
             {
-                using (DbContext originalTracker = OriginalDbContextTracker.Instance.AddTracker(sampleContext))
-                {
-                    // contexttemp.AsObjectContext().ObjectMaterialized += DBContextDumpExtensionsTest_ObjectMaterialized;
-                    //load one comment
-                    Post post = sampleContext.Posts.Find((Int64)3);
+                Post post = sampleContext.Posts.Find((Int64)1);
+                post.Body = "Changed : " + post.Body;
+                sampleContext.SaveChanges();
 
-                    post.Body = "Changed : " + post.Body;
+                var recordedContext = sampleContext.GetRecordedContext();
 
-                    sampleContext.SaveChanges();
+                sampleContext.PauseRecordingOriginalValues();
 
-                    xml_result_actual = await sampleContext.AsXmlAsync(ContextDataEnum.All);
-                    xml_result_ori = await originalTracker.AsXmlAsync(ContextDataEnum.All);
+                var result = await sampleContext.CompareTo(recordedContext);
 
-                    var result = await sampleContext.CompareTo(originalTracker);
+                result.AreEqual.ShouldBe(false);
+                result.Differences.Count.ShouldBe(1);
+                result.Differences[0].ToString().ShouldBe("Post.Body Should be [Original Body] but was [Changed : Original Body] - object with Post_Id : 1");
 
-                    result.AreEqual.ShouldBe(true, result.ToString());
-                }
+
+                sampleContext.StopRecordingOriginalValues();
 
             }
         }

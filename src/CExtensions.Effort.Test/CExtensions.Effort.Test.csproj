@@ -131,6 +131,12 @@
     <Content Include="input\test1_out.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="original-values-tests\test1_in.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="original-values-tests\test1_out.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CExetnsions.Test.Model\CExtensions.Test.Model.csproj">
