@@ -48,8 +48,6 @@ namespace CExtensions.EntityFramework
             return ((IObjectContextAdapter)dbContext).ObjectContext;
         }
 
-       
-
         public static MetadataWorkspace MetadataWorkspace(this DbContext dbContext)
         {
             return dbContext.AsObjectContext().MetadataWorkspace;;
@@ -86,12 +84,6 @@ namespace CExtensions.EntityFramework
             return sets;
         }
 
-        [Obsolete("The parameter 'assemblyName' is no longer used. it will be cleaned in next releases. it was marked as optional")]
-        public static IEnumerable<DbSet> DbSets(this DbContext dbContext, string assemblyName = null)
-        {
-            return dbContext.DbSets();
-        }
-
         public static IEnumerable<DbSet> DbSets(this DbContext dbContext)
         {
             IList<DbSet> result = new List<DbSet>();
@@ -111,11 +103,6 @@ namespace CExtensions.EntityFramework
             return result;
         }
 
-        [Obsolete("will be removed in further release : assemblyName no longer used")]
-        public static DbSet DbSetFor(this DbContext dbContext, String entityName, string assemblyName )
-        {
-            return dbContext.Set(entityName);
-        }
 
         public static DbSet Set(this DbContext dbContext, String entityName)
         {
@@ -151,64 +138,7 @@ namespace CExtensions.EntityFramework
             return result;
         }
 
-        public static bool IsNullOrEmpty(this string s)
-        {
-            return !s.IsNotNullOrEmpty();
-        }
-
-        public static bool IsNotNullOrEmpty(this string s)
-        {
-            if (s == null)
-            {
-                return false;
-            }
-
-            if (s == "")
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public static Object GetPropertyValue(this Object item, string proName)
-        {
-            if (item != null)
-            {
-                PropertyInfo value = item.GetType().GetProperty(proName);
-
-                if (value != null)
-                {
-                    return value.GetValue(item);
-                }
-
-            }
-
-            return null;
-        }
-
-        public static Object GetOriginalValue(this DbContext context, Object Entity, string proName)
-        {
-            var originalValues = context.AsObjectContext()
-                       .ObjectStateManager.GetObjectStateEntry(Entity).OriginalValues;
-
-            var value = originalValues[proName];
-
-            return value;
-
-            //if (Entity != null)
-            //{
-            //    PropertyInfo value = Entity.GetType().GetProperty(proName);
-
-            //}
-
-            //return null;
-           
-
-        }
-
-
-
-        public static Object GetPrimitivePropertyValue(this Object item, string proName)
+        private static Object GetPrimitivePropertyValue(this Object item, string proName)
         {
 
             if (proName.IsNullOrEmpty())
@@ -268,15 +198,13 @@ namespace CExtensions.EntityFramework
         {
             StringBuilder sb = new StringBuilder();
 
-            List<string> loadTracker = new List<string>();
-
             sb.Append("<" + rootName + ">");
 
                 switch(contextData)
                 {
                     case ContextDataEnum.Relations:
                     case ContextDataEnum.ParentRelations:
-                        LoadRelationsToLocal(dbContext, contextData);
+                        LoadRelations(dbContext, contextData);
                         goto case ContextDataEnum.Local;
                     case ContextDataEnum.Local:
                         WriteLocalItems(dbContext, sb, includeNull);
@@ -297,11 +225,9 @@ namespace CExtensions.EntityFramework
 
             foreach (var item in localItems)
             {
-                WriteElement(sb, item.Value, context, item.Key.Item1, item.Key.Item2, null, includeNull);
+                WriteElement(sb, item.Value, context, item.Key.Item1, includeNull);
             }
         }
-
-       
 
         public static String PrimaryKeyColumnFor(this DbContext dbContext, Type clrType)
         {
@@ -325,8 +251,6 @@ namespace CExtensions.EntityFramework
             return keyNames.FirstOrDefault();
         }
 
-
-
         public static String KeyMemberFor(this DbContext dbContext, Type clrType)
         {
             var set = dbContext.EntitySets().Where(s => s.ElementType.Name == clrType.Name).FirstOrDefault();
@@ -338,67 +262,39 @@ namespace CExtensions.EntityFramework
                                                         .Select(k => k.Name);
 
             return keyNames.FirstOrDefault();
-
-            #region old code
-            //try
-            //{
-
-            //    var metadata = dbContext.MetadataWorkspace()
-            //                        .GetType(type.Name, type.Namespace, DataSpace.CSpace)
-            //                        .MetadataProperties;
-           
-
-            //IEnumerable retval = (IEnumerable)metadata
-            //                    .Where(mp => mp.Name == "KeyMembers")
-            //                    .First()
-            //                    .Value;
-
-            //foreach (var i in retval)
-            //{
-            //    return i.ToString();
-            //}
-            //return null;
-            //}
-            //catch (Exception ex)
-            //{
-            //    var s = ex.Data;
-            //}
-            //return null;
-
-            #endregion
         }
 
-        //private static Boolean CanWrite(this List<string> container, string elemntType, Object id)
-        //{
-        //    string key = elemntType + id;
-
-        //    if (container.Contains(key))
-        //    {
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        container.Add(key);
-        //        return true;
-        //    }
-        //}
-
-        private static void LoadRelationsToLocal(DbContext dbContext, ContextDataEnum contextData)
+        private static void LoadRelations(DbContext dbContext, ContextDataEnum contextData)
         {
-            IDictionary<Tuple<string, Object>, object> localList =  GetLocalList(dbContext);
+            IEnumerable localList = dbContext.AllLocalItems();
 
-            foreach (var item in localList.Values)
+            foreach (var item in localList)
             {
                 if (contextData == ContextDataEnum.ParentRelations)
                 {
-                    LoadOneToOneRelations(dbContext, item);
+                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
                 }
                 else
                 {
-                    LoadOneToOneRelations(dbContext, item);
-                    LoadManyToManyRelations(dbContext, item);
+                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
+                    LoadRelations(dbContext, item, EndToEndEnum.OneToMany);
                 }
             }
+        }
+
+        private static IEnumerable AllLocalItems(this DbContext dbContext)
+        {
+            IList<object> result = new List<object>();
+
+            foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
+            {
+                var itemList = dbset.Local;
+                foreach (var item in itemList)
+                {
+                    result.Add(item);
+                }
+            }
+            return result;
         }
 
         private static IDictionary<Tuple<string, Object>, object> GetLocalList(DbContext dbContext)
@@ -423,9 +319,9 @@ namespace CExtensions.EntityFramework
             return localList;
         }
 
-        private static void LoadManyToManyRelations(DbContext dbContext, object item)
+        private static void LoadRelations(DbContext dbContext, object item, EndToEndEnum endToEndType)
         {
-            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, EndToEndEnum.OneToMany);
+            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, endToEndType);
 
             foreach (IRelatedEnd relEnd in relEnds)
             {
@@ -436,33 +332,14 @@ namespace CExtensions.EntityFramework
 
                 foreach (var loeadedItem in relEnd)
                 {
-                    LoadOneToOneRelations(dbContext, loeadedItem);
-                }
-            }
-
-        }
-
-        private static void LoadOneToOneRelations(DbContext dbContext, object item)
-        {
-            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, EndToEndEnum.OneToOne);
-
-            foreach (IRelatedEnd relEnd in relEnds)
-            {
-                if (!relEnd.IsLoaded)
-                {
-                    relEnd.Load();
-                }
-
-                foreach(var loeadedItem in relEnd)
-                {
-                    LoadOneToOneRelations(dbContext, loeadedItem);
+                    LoadRelations(dbContext, loeadedItem, EndToEndEnum.OneToOne);
                 }
             }
         }
+
 
         private enum EndToEndEnum
         {
-            All,
             OneToMany,
             OneToOne
         }
@@ -508,69 +385,11 @@ namespace CExtensions.EntityFramework
                     var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
                     var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
 
-                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, itemId,  null , includeNull);
+                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, includeNull);
                 }
             }
         }
 
-
-        private static async Task WriteDbSet(DbContext dbContext, ContextDataEnum contextData, StringBuilder sb, DbSet dbset, Object objectId = null, List<string> loadTracker = null, bool includeNull = true)
-        {
-            if (loadTracker == null)
-            {
-                loadTracker = new List<string>();
-            }
-
-            string entityName = dbset.ElementType.Name;
-
-            if (objectId == null)
-            {
-                var itemList = ((contextData == ContextDataEnum.Local) || (contextData == ContextDataEnum.Relations)) ? dbset.Local : await dbset.ToListAsync();
-
-                foreach (var item in itemList)
-                {
-                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
-                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
-
-                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, itemId, loadTracker, includeNull);
-                }
-            }
-            else
-            {
-                var item = await dbset.FindAsync(objectId);
-
-                if (item == null)
-                {
-                    throw new Exception("could not find item of type : " + entityName + " with id  : " + objectId);
-                }
-
-                WriteElement(sb, item, dbContext, dbset.ElementType.Name, objectId, loadTracker, includeNull);
-
-                await WriteItemCollections(dbContext, sb, loadTracker, item);
-
-            }
-
-        }
-
-        private static async Task WriteItemCollections(DbContext dbContext, StringBuilder sb, List<string> loadTracker, object item)
-        {
-            var collectionProps = from prop in item.GetType().GetProperties() where prop.IsACollectionType() select prop;
-
-            foreach (var prop in collectionProps)
-            {
-                //invoke on the item
-                IEnumerable linkedCollection = (IEnumerable)item.GetPropertyValue(prop.Name);
-
-                Type type = prop.PropertyType.GetGenericArguments()[0];
-
-                DbSet set = dbContext.Set(type.Name);
-
-                if (set != null)
-                {
-                    await WriteCollection(sb, linkedCollection, dbContext, type.Name, loadTracker);
-                }
-            }
-        }
 
         public static EntityMapping GetMappings(this DbContext dbContext, String TableName)
         {
@@ -633,41 +452,12 @@ namespace CExtensions.EntityFramework
         }
 
 
-        private static async Task WriteCollection(StringBuilder sb, IEnumerable items, DbContext dbContext, String elementName, List<string> loadTracker)
+        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Boolean includeNull)
         {
-
-            if (items == null)
-            {
-                return;
-            }
-
-            foreach (var item in items)
-            {
-                DbSet dbset = dbContext.Set(elementName);
-
-                string columnIdName = dbContext.KeyMemberFor(dbset.ElementType);
-
-                object idVal = item.GetPrimitivePropertyValue(columnIdName);
-
-                await WriteDbSet(dbContext, ContextDataEnum.All, sb, dbset, idVal, loadTracker);
-
-            }
-
-        }
-
-        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Object elementId, List<string> loadTracker, Boolean includeNull)
-//        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Boolean includeNull)
-        {
-           
             if(item == null)
             {
                 return;
             }
-
-            //if (!loadTracker.CanWrite(elementName, elementId))
-            //{
-            //    return;
-            //}
 
             string tableName = dbContext.MappedTable(elementName);
 
@@ -698,18 +488,6 @@ namespace CExtensions.EntityFramework
                         sb.Append(val);
                         sb.Append("</" + colName + ">");
                     }
-                    else
-                    {
-                        //sb.Append("<NullVal>");
-                        //sb.Append(proName);
-                        //sb.Append("</NullVal>");
-                    }
-                }
-                else
-                {
-                    //sb.Append("<ColumnNull>");
-                    //sb.Append(elementName + "." + proName);
-                    //sb.Append("</ColumnNull>");
                 }
             }
 
