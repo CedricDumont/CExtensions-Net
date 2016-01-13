@@ -41,6 +41,26 @@ namespace CExtensions.Effort
             }
         }
 
+        public async Task<DbContextCheckResult> Compare(Stream xmlactual, Stream xmlexpected)
+        {
+            DbContextCheckResult result = new DbContextCheckResult();
+
+            using (var expectedContext = this.Create(xmlexpected))
+            {
+                using (var actualContext = this.Create(xmlactual))
+                {
+                    result = await actualContext.CompareTo(expectedContext);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<DbContextCheckResult> Compare(string xmlactual, string xmlexpected)
+        {
+            return await Compare(xmlactual.AsStream(), xmlexpected.AsStream());
+        }
+
         public T InputContext(string testName, string folderName = "input", bool useTransient = true)
         {
             return Create(ContextEnum.Input, testName, folderName, useTransient);
@@ -49,6 +69,11 @@ namespace CExtensions.Effort
         public T ExpectedContext(string testName, string folderName = "input", bool useTransient = true)
         {
             return Create(ContextEnum.Expected, testName, folderName, useTransient);
+        }
+
+        public T Create(Stream xmlStream)
+        {
+            return DbContextFactory<T>.Create(xmlStream);
         }
 
 

@@ -183,6 +183,8 @@ namespace CExtensions.EntityFramework
             return await DbContextComparer.Compare(expectedContext, dbcontext, ignoredProperties);
         }
 
+       
+
 
         internal static IList<DbContextCheckEntry> ToDbContextCheckEntry(this IEnumerable<Difference> differences, 
             Object objectId, string objectName, Object objectValue, string idColumnName = null)

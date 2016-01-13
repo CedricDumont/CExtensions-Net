@@ -180,7 +180,6 @@ namespace CExtensions.EntityFramework
                 var clrType = ObjectContext.GetObjectType(e.Entity.GetType());
                 DbSet dbset = tempContext.Set(clrType);
                 var new_Entity = Activator.CreateInstance(clrType);
-                //var new_Entity = dbset.Create(clrType);
                 dbset.Add(new_Entity);
                 tempContext.Entry(new_Entity).CurrentValues.SetValues(e.Entity);
                 tempContext.Entry(new_Entity).State = EntityState.Unchanged;

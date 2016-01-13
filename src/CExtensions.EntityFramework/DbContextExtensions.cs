@@ -264,7 +264,7 @@ namespace CExtensions.EntityFramework
 
         }
 
-        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, string entityLoLoad = null, object objectEntityId = null, bool includeNull = true, bool originalValues = false)
+        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, bool includeNull = true)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -272,23 +272,36 @@ namespace CExtensions.EntityFramework
 
             sb.Append("<" + rootName + ">");
 
-            if (entityLoLoad.IsNotNullOrEmpty())
-            {
-                await WriteDbSet(dbContext, contextData, sb, dbContext.Set(entityLoLoad), objectEntityId, loadTracker: loadTracker, includeNull: includeNull);
-            }
-            else
-            {
-                foreach (DbSet dbset in dbContext.DbSets())
+                switch(contextData)
                 {
-                    await WriteDbSet(dbContext, contextData, sb, dbset, null, loadTracker:loadTracker, includeNull:includeNull);
+                    case ContextDataEnum.Relations:
+                    case ContextDataEnum.ParentRelations:
+                        LoadRelationsToLocal(dbContext, contextData);
+                        goto case ContextDataEnum.Local;
+                    case ContextDataEnum.Local:
+                        WriteLocalItems(dbContext, sb, includeNull);
+                        break;
+                    case ContextDataEnum.All:
+                        await WriteAll(dbContext, sb, includeNull);
+                        break;
                 }
-            }
 
             sb.Append("</" + rootName + ">");
 
             return sb.ToString();
-
         }
+
+        public static void WriteLocalItems(DbContext context, StringBuilder sb, bool includeNull)
+        {
+            var localItems = GetLocalList(context);
+
+            foreach (var item in localItems)
+            {
+                WriteElement(sb, item.Value, context, item.Key.Item1, item.Key.Item2, null, includeNull);
+            }
+        }
+
+       
 
         public static String PrimaryKeyColumnFor(this DbContext dbContext, Type clrType)
         {
@@ -355,20 +368,151 @@ namespace CExtensions.EntityFramework
             #endregion
         }
 
-        private static Boolean CanWrite(this List<string> container, string elemntType, Object id)
-        {
-            string key = elemntType + id;
+        //private static Boolean CanWrite(this List<string> container, string elemntType, Object id)
+        //{
+        //    string key = elemntType + id;
 
-            if (container.Contains(key))
+        //    if (container.Contains(key))
+        //    {
+        //        return false;
+        //    }
+        //    else
+        //    {
+        //        container.Add(key);
+        //        return true;
+        //    }
+        //}
+
+        private static void LoadRelationsToLocal(DbContext dbContext, ContextDataEnum contextData)
+        {
+            IDictionary<Tuple<string, Object>, object> localList =  GetLocalList(dbContext);
+
+            foreach (var item in localList.Values)
             {
-                return false;
-            }
-            else
-            {
-                container.Add(key);
-                return true;
+                if (contextData == ContextDataEnum.ParentRelations)
+                {
+                    LoadOneToOneRelations(dbContext, item);
+                }
+                else
+                {
+                    LoadOneToOneRelations(dbContext, item);
+                    LoadManyToManyRelations(dbContext, item);
+                }
             }
         }
+
+        private static IDictionary<Tuple<string, Object>, object> GetLocalList(DbContext dbContext)
+        {
+            IDictionary<Tuple<string, Object>, object> localList = new Dictionary<Tuple<string, object>, object>();
+
+            foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
+            {
+                var itemList = dbset.Local;
+
+                foreach (var item in itemList)
+                {
+                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
+                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
+
+                    var key = Tuple.Create(dbset.ElementType.Name, itemId);
+
+                    localList.Add(key, item);
+                }
+            }
+
+            return localList;
+        }
+
+        private static void LoadManyToManyRelations(DbContext dbContext, object item)
+        {
+            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, EndToEndEnum.OneToMany);
+
+            foreach (IRelatedEnd relEnd in relEnds)
+            {
+                if (!relEnd.IsLoaded)
+                {
+                    relEnd.Load();
+                }
+
+                foreach (var loeadedItem in relEnd)
+                {
+                    LoadOneToOneRelations(dbContext, loeadedItem);
+                }
+            }
+
+        }
+
+        private static void LoadOneToOneRelations(DbContext dbContext, object item)
+        {
+            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, EndToEndEnum.OneToOne);
+
+            foreach (IRelatedEnd relEnd in relEnds)
+            {
+                if (!relEnd.IsLoaded)
+                {
+                    relEnd.Load();
+                }
+
+                foreach(var loeadedItem in relEnd)
+                {
+                    LoadOneToOneRelations(dbContext, loeadedItem);
+                }
+            }
+        }
+
+        private enum EndToEndEnum
+        {
+            All,
+            OneToMany,
+            OneToOne
+        }
+
+        private static IEnumerable<IRelatedEnd> GetAllRelatedEnds(this DbContext dbContext, Object item, EndToEndEnum endToEndEnum)
+        {
+            var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
+
+            List<IRelatedEnd> relEndsResult = new List<IRelatedEnd>();
+
+            IEnumerable<IRelatedEnd> relEnds =
+               itemEntry.RelationshipManager
+                    .GetAllRelatedEnds();
+
+            if (relEnds.Count() > 0)
+            {
+                foreach (IRelatedEnd relEnd in relEnds)
+                {
+                    var typeofrel = relEnd.GetType();
+
+                    if (endToEndEnum == EndToEndEnum.OneToOne && relEnd is System.Data.Entity.Core.Objects.DataClasses.EntityReference)
+                    {
+                        relEndsResult.Add(relEnd);
+                    }
+                    else if(endToEndEnum == EndToEndEnum.OneToMany && !(relEnd is System.Data.Entity.Core.Objects.DataClasses.EntityReference)) { 
+                        //here big assumption....
+                        relEndsResult.Add(relEnd);
+                    }
+                }
+            }
+
+            return relEndsResult;
+        }
+
+        private static async Task WriteAll(DbContext dbContext, StringBuilder sb, bool includeNull = true)
+        {
+            foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
+            {
+                var itemList = await dbset.ToListAsync();
+
+                foreach (var item in itemList)
+                {
+                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
+                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
+
+                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, itemId,  null , includeNull);
+                }
+            }
+        }
+
 
         private static async Task WriteDbSet(DbContext dbContext, ContextDataEnum contextData, StringBuilder sb, DbSet dbset, Object objectId = null, List<string> loadTracker = null, bool includeNull = true)
         {
@@ -389,29 +533,6 @@ namespace CExtensions.EntityFramework
                     var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
 
                     WriteElement(sb, item, dbContext, dbset.ElementType.Name, itemId, loadTracker, includeNull);
-
-                    IEnumerable<IRelatedEnd> relEnds =
-                    itemEntry.RelationshipManager
-                         .GetAllRelatedEnds();
-
-                    if (contextData == ContextDataEnum.Relations)
-                    {
-                        foreach (IRelatedEnd relEnd in relEnds)
-                        {
-                            
-                                relEnd.Load();
-                                foreach (var loadedItem in relEnd)
-                                {
-                                    var loadedItemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(loadedItem);
-                                    var loadedItemEntryId = loadedItemEntry.EntityKey.EntityKeyValues[0].Value;
-
-                                    WriteElement(sb, loadedItemEntry.Entity, dbContext, loadedItemEntry.EntitySet.ElementType.Name, loadedItemEntryId, loadTracker, includeNull);
-                                }
-                           
-                        }
-                    }
-
-
                 }
             }
             else
@@ -543,10 +664,10 @@ namespace CExtensions.EntityFramework
                 return;
             }
 
-            if (!loadTracker.CanWrite(elementName, elementId))
-            {
-                return;
-            }
+            //if (!loadTracker.CanWrite(elementName, elementId))
+            //{
+            //    return;
+            //}
 
             string tableName = dbContext.MappedTable(elementName);
 

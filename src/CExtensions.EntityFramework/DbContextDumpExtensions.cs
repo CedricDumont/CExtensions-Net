@@ -20,7 +20,8 @@ namespace CExtensions.EntityFramework
     {
         Local,
         All,
-        Relations
+        Relations,
+        ParentRelations
     }
     public static class DbContextDumpExtensions
     {
@@ -28,12 +29,9 @@ namespace CExtensions.EntityFramework
             this DbContext dbContext, 
             ContextDataEnum contextData = ContextDataEnum.Local,
             string root = "Root",
-            string entityToLoad = null,
-            object objectEntityId = null,
-            bool includeNull = false,
-            bool originalValues = false)
+            bool includeNull = false)
         {
-            return ((await dbContext.ToXml(root, contextData, entityToLoad, objectEntityId,includeNull, originalValues)).FormatXml());
+            return ((await dbContext.ToXml(root, contextData, includeNull)).FormatXml());
         }
 
 

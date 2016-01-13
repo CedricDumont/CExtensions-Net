@@ -64,7 +64,6 @@ namespace CExtensions.Test
         }
 
         [Theory]
-        [InlineData("test_1", 2, ContextDataEnum.Local)]
         [InlineData("test_1", 2, ContextDataEnum.All)]
         [InlineData("test_1", 2, ContextDataEnum.Relations)]
         [InlineData("test_1", 1, ContextDataEnum.Relations)]
@@ -78,7 +77,48 @@ namespace CExtensions.Test
                 String xml_result_exepcted = GetOutFileContent(testin + contextData.ToString("G") + postId, "as-xml-tests");
                 string xml_result_actual = await ctx.AsXmlAsync(contextData);
 
-                var result = new XmlComparisonUtils().CompareXml(xml_result_actual, xml_result_exepcted);
+                var result = await xmlFileCtx.Compare(xml_result_actual, xml_result_exepcted);
+                result.AreEqual.ShouldBe(true, result.ToString());
+            }
+        }
+
+        [Theory]
+        [InlineData("test_2", 1, ContextDataEnum.Relations)]
+        [InlineData("test_2", 2, ContextDataEnum.Relations)]
+        public async Task TestLoadingChilds(string testin, Int64 autId, ContextDataEnum contextData)
+        {
+            XmlFileContext<SampleContext> xmlFileCtx = new XmlFileContext<SampleContext>(this.GetType());
+
+            string testOut = testin + contextData.ToString("G") + autId;
+
+            using (SampleContext ctx = xmlFileCtx.InputContext(testin, "as-xml-tests"))
+            {
+                ctx.Authors.Find(autId);
+               
+                String xml_result_exepcted = GetOutFileContent(testOut,"as-xml-tests");
+                string xml_result_actual = await ctx.AsXmlAsync(contextData);
+
+                var result = await xmlFileCtx.Compare(xml_result_actual, xml_result_exepcted);
+                result.AreEqual.ShouldBe(true, result.ToString());
+            }
+        }
+
+        [Theory]
+        [InlineData("test_3", 3, ContextDataEnum.ParentRelations)]
+        public async Task TestLoadingParent(string testin, Int64 comId, ContextDataEnum contextData)
+        {
+            XmlFileContext<SampleContext> xmlFileCtx = new XmlFileContext<SampleContext>(this.GetType());
+
+            string testOut = testin + contextData.ToString("G") + comId;
+
+            using (SampleContext ctx = xmlFileCtx.InputContext(testin, "as-xml-tests"))
+            {
+                ctx.Comments.Find(comId);
+
+                String xml_result_exepcted = GetOutFileContent(testOut, "as-xml-tests");
+                string xml_result_actual = await ctx.AsXmlAsync(contextData);
+
+                var result = await xmlFileCtx.Compare(xml_result_actual, xml_result_exepcted);
                 result.AreEqual.ShouldBe(true, result.ToString());
             }
         }
