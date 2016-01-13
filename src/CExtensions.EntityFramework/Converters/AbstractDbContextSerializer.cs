@@ -106,20 +106,20 @@ namespace CExtensions.EntityFramework.Converters
             get; private set;
         }
 
-        protected void LoadRelations(DbContext dbContext, ContextDataEnum contextData)
+        protected void LoadRelations()
         {
-            IEnumerable localList = dbContext.AllLocalItems();
+            IEnumerable localList = Context.AllLocalItems();
 
             foreach (var item in localList)
             {
-                if (contextData == ContextDataEnum.ParentRelations)
+                if (Options.ContextData == ContextDataEnum.ParentRelations)
                 {
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
+                    LoadRelations(Context, item, EndToEndEnum.OneToOne);
                 }
                 else
                 {
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToMany);
+                    LoadRelations(Context, item, EndToEndEnum.OneToOne);
+                    LoadRelations(Context, item, EndToEndEnum.OneToMany);
                 }
             }
         }

@@ -59,13 +59,13 @@ namespace CExtensions.EntityFramework.Converters
             {
                 case ContextDataEnum.Relations:
                 case ContextDataEnum.ParentRelations:
-                    LoadRelations(Context, Options.ContextData);
+                    LoadRelations();
                     goto case ContextDataEnum.Local;
                 case ContextDataEnum.Local:
                     WriteLocalItems(sb, Options.IncludeNull);
                     break;
                 case ContextDataEnum.All:
-                    await WriteAll(Context, sb, Options.IncludeNull);
+                    await WriteAll(sb, Options.IncludeNull);
                     break;
             }
 
@@ -92,15 +92,15 @@ namespace CExtensions.EntityFramework.Converters
             }
         }
 
-        private async Task WriteAll(DbContext dbContext, StringBuilder sb, bool includeNull = true)
+        private async Task WriteAll(StringBuilder sb, bool includeNull = true)
         {
-            foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
+            foreach (DbSet dbset in Context.DbSets().OrderBy(s => s.ElementType.Name))
             {
                 var itemList = await dbset.ToListAsync();
 
                 foreach (var item in itemList)
                 {
-                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
+                    var itemEntry = Context.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
                     var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
 
                     WriteElement(sb, item, dbset.ElementType.Name, includeNull);
