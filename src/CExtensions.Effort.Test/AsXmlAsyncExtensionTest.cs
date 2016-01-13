@@ -9,6 +9,7 @@ using System.Xml;
 using Shouldly;
 using Test.Helper;
 using CExtensions.Xml;
+using CExtensions.EntityFramework.Converters;
 
 namespace CExtensions.Test
 {
@@ -35,8 +36,7 @@ namespace CExtensions.Test
 
             using (SampleContext ctx = xmlFileCtx.InputContext("test1"))
             {
-
-                string fromFile = await ctx.AsXmlAsync(ContextDataEnum.All);
+                string fromFile = await ctx.AsXmlAsync(DbContextConverterOptions.DEFAULT.WithAll());
                 dynamic obj = fromFile.XmlToDynamic();
 
                 ((string)obj.AUTHOR[0].AUT_FIRSTNAME).ShouldBe("John");
@@ -55,7 +55,7 @@ namespace CExtensions.Test
 
                 emptyContext.Authors.Attach(aut1);
 
-                string fromFile = await emptyContext.AsXmlAsync(ContextDataEnum.Local, includeNull: true);
+                string fromFile = await emptyContext.AsXmlAsync(DbContextConverterOptions.DEFAULT.WithNullValues());
 
                 dynamic obj = fromFile.XmlToDynamic();
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using CExtensions.EntityFramework;
 
-namespace CExtensions.EntityFramework.Serializer
+namespace CExtensions.EntityFramework.Converters
 {
 
     public enum EndToEndEnum
@@ -19,45 +19,61 @@ namespace CExtensions.EntityFramework.Serializer
         OneToOne
     }
 
-    public class XmlDbContextConverter : AbstractDbContextSerializer
+    public class XmlDbContextConverterOptions : DbContextConverterOptions
     {
-        public XmlDbContextConverter(DbContext context) : base(context)
+        public XmlDbContextConverterOptions(DbContextConverterOptions options = null) : base (options)
         {
         }
 
-        public String RootName { get; set; } = "Root";
+        public String RootName { get; private set; } = "Root";
 
-        public ContextDataEnum ContextData { get; set; } = ContextDataEnum.Local;
+        public XmlDbContextConverterOptions WithThisRootName(string rootName)
+        {
+            this.RootName = rootName;
+            return this;
+        }
+    }
 
-        public Boolean IncludeNull { get; set; }
+    public class XmlDbContextConverter : AbstractDbContextSerializer
+    {
+        public XmlDbContextConverter(DbContext context, DbContextConverterOptions options = null) : base(context, new XmlDbContextConverterOptions(options))
+        {
+        }
 
-        public Boolean Idented { get; set; } = true;
+        protected override DbContextConverterOptions GetDefaultOptions()
+        {
+            return new XmlDbContextConverterOptions();
+        }
 
         public async Task<String> Serialize()
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("<" + RootName + ">");
+            var options = Options as XmlDbContextConverterOptions;
 
-            switch (ContextData)
+            string rootName = options.RootName;
+
+            sb.Append("<" + rootName + ">");
+
+            switch (Options.ContextData)
             {
                 case ContextDataEnum.Relations:
                 case ContextDataEnum.ParentRelations:
-                    LoadRelations(Context, ContextData);
+                    LoadRelations(Context, Options.ContextData);
                     goto case ContextDataEnum.Local;
                 case ContextDataEnum.Local:
-                    WriteLocalItems(sb, IncludeNull);
+                    WriteLocalItems(sb, Options.IncludeNull);
                     break;
                 case ContextDataEnum.All:
-                    await WriteAll(Context, sb, IncludeNull);
+                    await WriteAll(Context, sb, Options.IncludeNull);
                     break;
             }
 
-            sb.Append("</" + RootName + ">");
+            sb.Append("</" + rootName + ">");
 
             String result = sb.ToString();
 
-            if (Idented)
+            if (Options.Idented)
             {
                 result = result.FormatXml();
             }

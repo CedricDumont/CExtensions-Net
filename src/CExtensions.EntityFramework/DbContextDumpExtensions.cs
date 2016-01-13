@@ -12,7 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
-using CExtensions.EntityFramework.Serializer;
+using CExtensions.EntityFramework.Converters;
+using CExtensions.EntityFramework.Converters;
 
 namespace CExtensions.EntityFramework
 {
@@ -27,17 +28,21 @@ namespace CExtensions.EntityFramework
     public static class DbContextDumpExtensions
     {
         public static async Task<string> AsXmlAsync(
-            this DbContext dbContext, 
-            ContextDataEnum contextData = ContextDataEnum.Local,
-            string root = "Root",
-            bool includeNull = false)
+            this DbContext dbContext,
+            DbContextConverterOptions options = null
+           )
         {
-            var converter = new XmlDbContextConverter(dbContext);
-            converter.RootName = root;
-            converter.IncludeNull = includeNull;
-            converter.ContextData = contextData;
+            var converter = new XmlDbContextConverter(dbContext, options);
             return await converter.Serialize();
         }
-       
+
+        public static async Task<string> AsXmlAsync(
+           this DbContext dbContext,
+           ContextDataEnum contextData
+          )
+        {
+            DbContextConverterOptions options = DbContextConverterOptions.DEFAULT.WithContextData(contextData);
+            return await  dbContext.AsXmlAsync(options);
+        }
     }
 }

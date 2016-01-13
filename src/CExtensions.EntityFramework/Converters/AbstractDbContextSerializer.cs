@@ -8,16 +8,100 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CExtensions.EntityFramework.Serializer
+namespace CExtensions.EntityFramework.Converters
 {
-    public class AbstractDbContextSerializer : IDbContextConverter
+    public class DbContextConverterOptions
     {
-        public AbstractDbContextSerializer(DbContext context)
+       
+
+        private DbContextConverterOptions()
         {
-            Context = context;
+
         }
 
+        public DbContextConverterOptions(DbContextConverterOptions fromOptions = null)
+        {
+            fromOptions = fromOptions ?? DbContextConverterOptions.DEFAULT;
+            this.ContextData = fromOptions.ContextData;
+            this.IncludeNull = fromOptions.IncludeNull;
+            this.Idented = fromOptions.Idented;
+        }
+
+        public static DbContextConverterOptions DEFAULT
+        {
+            get
+            {
+                return new DbContextConverterOptions();
+            }
+        }
+
+        public ContextDataEnum ContextData { get; private set; } = ContextDataEnum.Local;
+
+        public Boolean IncludeNull { get; private set; }
+
+        public Boolean Idented { get; private set; } = true;
+
+        public DbContextConverterOptions WithNullValues()
+        {
+            this.IncludeNull = true;
+            return this;
+        }
+
+        public DbContextConverterOptions WithRelations()
+        {
+            this.ContextData = ContextDataEnum.Relations;
+            return this;
+        }
+
+        public DbContextConverterOptions WithParentRelations()
+        {
+            this.ContextData = ContextDataEnum.ParentRelations;
+            return this;
+        }
+
+        public DbContextConverterOptions WithAll()
+        {
+            this.ContextData = ContextDataEnum.All;
+            return this;
+        }
+
+        public DbContextConverterOptions WithContextData(ContextDataEnum contextData)
+        {
+            this.ContextData = contextData;
+            return this;
+        }
+
+        public DbContextConverterOptions WithNoFormating()
+        {
+            this.Idented = false;
+            return this;
+        }
+    }
+
+    public abstract class AbstractDbContextSerializer : IDbContextConverter
+    {
+        public AbstractDbContextSerializer(DbContext context, DbContextConverterOptions options)
+        {
+            Context = context;
+
+            if (options == null)
+            {
+                Options = GetDefaultOptions();
+            }
+            else
+            {
+                Options = options;
+            }
+        }
+
+        protected abstract DbContextConverterOptions GetDefaultOptions();
+
         protected DbContext Context
+        {
+            get; private set;
+        }
+
+        protected DbContextConverterOptions Options
         {
             get; private set;
         }
@@ -127,6 +211,8 @@ namespace CExtensions.EntityFramework.Serializer
 
             return result;
         }
+
+
 
     }
 }
