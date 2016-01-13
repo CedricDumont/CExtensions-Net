@@ -1,13 +1,9 @@
-﻿using Castle.DynamicProxy;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
 
 namespace CExtensions.EntityFramework
 {
@@ -35,8 +31,6 @@ namespace CExtensions.EntityFramework
             }
             
             T originalValuesContext = (T)constructor.Invoke(new Object[] { trackedContext.AsObjectContext().Connection, false });
-
-           // T originalValuesContext = (T)new ProxyGenerator().CreateClassProxy(typeof(T), new Object[] { trackedContext.AsObjectContext().Connection, false }, new DbContextInterceptor() { Name = "original" });
 
           
             //Just to retrieve it later on
@@ -126,37 +120,6 @@ namespace CExtensions.EntityFramework
 
             _OriginalValuesDbContextCollection.Clear();
             _TrackedDbContextCollection.Clear();
-        }
-    }
-
-    public class DisposeMethodInterceptorHook : IProxyGenerationHook
-    {
-        public void MethodsInspected()
-        {
-            Console.WriteLine("inspected");
-            //throw new NotImplementedException();
-        }
-
-        public void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
-        {
-            Console.WriteLine("NonProxyableMemberNotification");
-            //throw new NotImplementedException();
-        }
-
-        public bool ShouldInterceptMethod(Type type, MethodInfo methodInfo)
-        {
-            return true;
-        }
-    }
-
-    public class DbContextInterceptor : IInterceptor
-    {
-        public String Name { get; set; }
-
-        public void Intercept(IInvocation invocation)
-        {
-            Console.Write(Name);
-            invocation.Proceed();
         }
     }
 

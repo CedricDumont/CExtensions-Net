@@ -1,19 +1,11 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Xunit;
 using Shouldly;
 using CExtensions.Test.Model;
-using CExtensions.EntityFramework;
 using CExtensions.Effort;
 using System.Threading.Tasks;
 using System.Linq;
 using Effort;
-using Effort.DataLoaders.Xml;
-using System.Data.Entity;
-using System.Diagnostics;
-using System.Data.Entity.Core.Objects;
-using CloneExtensions;
-using Newtonsoft.Json;
 using CExtensions.Xml;
 
 namespace CExtensions.EntityFramework.Test
