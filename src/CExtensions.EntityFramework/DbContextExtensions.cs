@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CExtensions.EntityFramework.Serializer;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -73,7 +74,6 @@ namespace CExtensions.EntityFramework
             return sets;
         }
 
-
         public static IList<EntitySet> EntitySets(this DbContext dbContext)
         {
             EntityContainerMapping mapping = dbContext.MetadataWorkspace().GetItems<EntityContainerMapping>(DataSpace.CSSpace)
@@ -102,7 +102,6 @@ namespace CExtensions.EntityFramework
 
             return result;
         }
-
 
         public static DbSet Set(this DbContext dbContext, String entityName)
         {
@@ -138,46 +137,6 @@ namespace CExtensions.EntityFramework
             return result;
         }
 
-        private static Object GetPrimitivePropertyValue(this Object item, string proName)
-        {
-
-            if (proName.IsNullOrEmpty())
-            {
-                return null; 
-            }
-
-            string[] AcceptedTypes = {
-                                         "System.String",
-                                         "System.Int32",
-                                         "System.Int64",
-                                         "System.Int16",
-                                         "System.Long",
-                                         "System.DateTime",
-                                         "System.Boolean",
-                                         "System.Decimal"
-                                     };
-            object result = null;
-
-            if (item != null)
-            {
-                PropertyInfo value = item.GetType().GetProperty(proName);
-
-                if (value.PropertyType.FullName.ContainsOneOf(AcceptedTypes))
-                {
-
-                    if (value != null)
-                    {
-                        object val = value.GetValue(item);
-
-                        result = val == null ? null : val;
-                    }
-                }
-
-            }
-
-            return result;
-        }
-
         public static String MappedTable(this DbContext dbContext, string entityName)
         {
             string tableName = (from t in dbContext.StoreEntitySets() where t.Name.ToUpper() == entityName.ToUpper() select t.Table).FirstOrDefault();
@@ -192,41 +151,6 @@ namespace CExtensions.EntityFramework
 
             return entityName;
 
-        }
-
-        internal static async Task<string> ToXml(this DbContext dbContext, string rootName = "Root", ContextDataEnum contextData = ContextDataEnum.Local, bool includeNull = true)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.Append("<" + rootName + ">");
-
-                switch(contextData)
-                {
-                    case ContextDataEnum.Relations:
-                    case ContextDataEnum.ParentRelations:
-                        LoadRelations(dbContext, contextData);
-                        goto case ContextDataEnum.Local;
-                    case ContextDataEnum.Local:
-                        WriteLocalItems(dbContext, sb, includeNull);
-                        break;
-                    case ContextDataEnum.All:
-                        await WriteAll(dbContext, sb, includeNull);
-                        break;
-                }
-
-            sb.Append("</" + rootName + ">");
-
-            return sb.ToString();
-        }
-
-        public static void WriteLocalItems(DbContext context, StringBuilder sb, bool includeNull)
-        {
-            var localItems = GetLocalList(context);
-
-            foreach (var item in localItems)
-            {
-                WriteElement(sb, item.Value, context, item.Key.Item1, includeNull);
-            }
         }
 
         public static String PrimaryKeyColumnFor(this DbContext dbContext, Type clrType)
@@ -264,25 +188,7 @@ namespace CExtensions.EntityFramework
             return keyNames.FirstOrDefault();
         }
 
-        private static void LoadRelations(DbContext dbContext, ContextDataEnum contextData)
-        {
-            IEnumerable localList = dbContext.AllLocalItems();
-
-            foreach (var item in localList)
-            {
-                if (contextData == ContextDataEnum.ParentRelations)
-                {
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
-                }
-                else
-                {
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToOne);
-                    LoadRelations(dbContext, item, EndToEndEnum.OneToMany);
-                }
-            }
-        }
-
-        private static IEnumerable AllLocalItems(this DbContext dbContext)
+        public static IEnumerable AllLocalItems(this DbContext dbContext)
         {
             IList<object> result = new List<object>();
 
@@ -297,7 +203,7 @@ namespace CExtensions.EntityFramework
             return result;
         }
 
-        private static IDictionary<Tuple<string, Object>, object> GetLocalList(DbContext dbContext)
+        public static IDictionary<Tuple<string, Object>, object> GetLocalList(this DbContext dbContext)
         {
             IDictionary<Tuple<string, Object>, object> localList = new Dictionary<Tuple<string, object>, object>();
 
@@ -318,79 +224,7 @@ namespace CExtensions.EntityFramework
 
             return localList;
         }
-
-        private static void LoadRelations(DbContext dbContext, object item, EndToEndEnum endToEndType)
-        {
-            IEnumerable<IRelatedEnd> relEnds = dbContext.GetAllRelatedEnds(item, endToEndType);
-
-            foreach (IRelatedEnd relEnd in relEnds)
-            {
-                if (!relEnd.IsLoaded)
-                {
-                    relEnd.Load();
-                }
-
-                foreach (var loeadedItem in relEnd)
-                {
-                    LoadRelations(dbContext, loeadedItem, EndToEndEnum.OneToOne);
-                }
-            }
-        }
-
-
-        private enum EndToEndEnum
-        {
-            OneToMany,
-            OneToOne
-        }
-
-        private static IEnumerable<IRelatedEnd> GetAllRelatedEnds(this DbContext dbContext, Object item, EndToEndEnum endToEndEnum)
-        {
-            var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
-
-            List<IRelatedEnd> relEndsResult = new List<IRelatedEnd>();
-
-            IEnumerable<IRelatedEnd> relEnds =
-               itemEntry.RelationshipManager
-                    .GetAllRelatedEnds();
-
-            if (relEnds.Count() > 0)
-            {
-                foreach (IRelatedEnd relEnd in relEnds)
-                {
-                    var typeofrel = relEnd.GetType();
-
-                    if (endToEndEnum == EndToEndEnum.OneToOne && relEnd is System.Data.Entity.Core.Objects.DataClasses.EntityReference)
-                    {
-                        relEndsResult.Add(relEnd);
-                    }
-                    else if(endToEndEnum == EndToEndEnum.OneToMany && !(relEnd is System.Data.Entity.Core.Objects.DataClasses.EntityReference)) { 
-                        //here big assumption....
-                        relEndsResult.Add(relEnd);
-                    }
-                }
-            }
-
-            return relEndsResult;
-        }
-
-        private static async Task WriteAll(DbContext dbContext, StringBuilder sb, bool includeNull = true)
-        {
-            foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
-            {
-                var itemList = await dbset.ToListAsync();
-
-                foreach (var item in itemList)
-                {
-                    var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
-                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
-
-                    WriteElement(sb, item, dbContext, dbset.ElementType.Name, includeNull);
-                }
-            }
-        }
-
-
+      
         public static EntityMapping GetMappings(this DbContext dbContext, String TableName)
         {
             string entityName = dbContext.MappedEntity(TableName);
@@ -427,7 +261,6 @@ namespace CExtensions.EntityFramework
             return colName;
         }
 
-
         public static String MappedPropertyName(this DbContext dbContext, string tableName, string columnName)
         {
             var entityName = dbContext.MappedEntity(tableName);
@@ -452,47 +285,7 @@ namespace CExtensions.EntityFramework
         }
 
 
-        private static void WriteElement(StringBuilder sb, Object item, DbContext dbContext, String elementName, Boolean includeNull)
-        {
-            if(item == null)
-            {
-                return;
-            }
-
-            string tableName = dbContext.MappedTable(elementName);
-
-            sb.Append("<" + tableName + ">");
-
-            var properties = item.GetType().GetProperties();
-
-            foreach (var prop in properties)
-            {
-                string proName = prop.Name;
-                string colName = dbContext.MappedColumnName(elementName, proName);
-
-                if (colName.IsNotNullOrEmpty())
-                {
-                    object val = item.GetPrimitivePropertyValue(proName);
-
-                    if (val != null || includeNull)
-                    {
-                        sb.Append("<" + colName + ">");
-                        if(val is DateTime)
-                        {
-                            val = XmlConvert.ToString((DateTime)val);
-                        }
-                        if (val is decimal)
-                        {
-                            val = XmlConvert.ToString((decimal)val);
-                        }
-                        sb.Append(val);
-                        sb.Append("</" + colName + ">");
-                    }
-                }
-            }
-
-            sb.Append("</" + tableName + ">");
-        }
+      
     }
 
     public class EntityMapping

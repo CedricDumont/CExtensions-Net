@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
+using CExtensions.EntityFramework.Serializer;
 
 namespace CExtensions.EntityFramework
 {
@@ -31,10 +32,12 @@ namespace CExtensions.EntityFramework
             string root = "Root",
             bool includeNull = false)
         {
-            return ((await dbContext.ToXml(root, contextData, includeNull)).FormatXml());
+            var converter = new XmlDbContextConverter(dbContext);
+            converter.RootName = root;
+            converter.IncludeNull = includeNull;
+            converter.ContextData = contextData;
+            return await converter.Serialize();
         }
-
-
        
     }
 }

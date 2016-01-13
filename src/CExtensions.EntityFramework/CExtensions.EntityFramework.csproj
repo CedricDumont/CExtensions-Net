@@ -73,6 +73,9 @@
     <Compile Include="EntityTypeExtensions.cs" />
     <Compile Include="OriginalDbContextTracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Serializer\AbstractDbContextSerializer.cs" />
+    <Compile Include="Serializer\IDbContextConverter.cs" />
+    <Compile Include="Serializer\XmlDbContextSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
