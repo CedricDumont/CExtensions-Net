@@ -203,9 +203,9 @@ namespace CExtensions.EntityFramework
             return result;
         }
 
-        public static IDictionary<Tuple<string, Object>, object> GetLocalList(this DbContext dbContext)
+        public static IDictionary<Tuple<string, String>, object> GetLocalList(this DbContext dbContext)
         {
-            IDictionary<Tuple<string, Object>, object> localList = new Dictionary<Tuple<string, object>, object>();
+            IDictionary<Tuple<string, String>, object> localList = new Dictionary<Tuple<string, string>, object>();
 
             foreach (DbSet dbset in dbContext.DbSets().OrderBy(s => s.ElementType.Name))
             {
@@ -214,7 +214,11 @@ namespace CExtensions.EntityFramework
                 foreach (var item in itemList)
                 {
                     var itemEntry = dbContext.AsObjectContext().ObjectStateManager.GetObjectStateEntry(item);
-                    var itemId = itemEntry.EntityKey.EntityKeyValues[0].Value;
+                    String itemId = "";
+                    foreach(var keyValue in itemEntry.EntityKey.EntityKeyValues)
+                    {
+                        itemId += keyValue;
+                    }
 
                     var key = Tuple.Create(dbset.ElementType.Name, itemId);
 
