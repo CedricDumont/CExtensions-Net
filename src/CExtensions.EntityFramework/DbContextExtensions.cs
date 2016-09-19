@@ -228,7 +228,18 @@ namespace CExtensions.EntityFramework
 
             return localList;
         }
-      
+
+        public static IList<EntityMapping> GetMappings(this DbContext dbContext)
+        {
+            var result = new List<EntityMapping>();
+            foreach (var entitySet in dbContext.EntitySets())
+            {
+                EntityType entityType = entitySet.ElementType;
+                result.Add(GetEntityMapping(dbContext, entityType.GetClrType()));
+            }
+            return result;
+        }
+
         public static EntityMapping GetMappings(this DbContext dbContext, String TableName)
         {
             string entityName = dbContext.MappedEntity(TableName);

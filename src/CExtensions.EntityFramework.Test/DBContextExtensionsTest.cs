@@ -104,6 +104,20 @@ namespace CExtensions.EntityFramework.Test
         }
 
         [Fact]
+        public void ShouldGetAllMappings()
+        {
+            using (SampleContext emptyContext = new XmlFileContext<SampleContext>(this.GetType()).Empty())
+            {
+                var entityMappings = emptyContext.GetMappings();
+
+                entityMappings.Count.ShouldBe(3);
+                entityMappings.Where(t => t.Table == "AUTHOR").FirstOrDefault().ShouldNotBe(null);
+                entityMappings.Where(t => t.Table == "COMMENT").FirstOrDefault().ShouldNotBe(null);
+                entityMappings.Where(t => t.Table == "POST").FirstOrDefault().ShouldNotBe(null);
+            }
+        }
+
+        [Fact]
         public void ShouldGetMappings()
         {
             using (SampleContext emptyContext = new XmlFileContext<SampleContext>(this.GetType()).Empty())
